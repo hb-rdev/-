@@ -1,0 +1,6 @@
+{
+  "name": "연금저축펀드 시뮬레이터",
+  "description": "연금저축펀드, 세제비적격 연금보험 및 하이브리드 시나리오의 적립기와 수령기 재무 흐름을 예측하고 시뮬레이션하는 인터랙티브 자산 설계 도구",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
