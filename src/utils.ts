@@ -153,27 +153,35 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
     const taxCreditThisYear = (isNonTaxable || !isPayingThisYear) ? 0 : getAnnualCredit(monthlyDeposit, taxCreditRate);
     cumulativeRefundTotal += taxCreditThisYear;
 
-    // 기중 입금 및 재투자 처리
-    const principal_add = depositThisYear;
-    const reinvest_add = (!isNonTaxable && reinvestTaxCredit && age > startAge) ? pendingTaxCredit : 0;
+    let yearInvestmentReturn = 0;
 
-    // 기중 가합산
-    const principal_mid = principal + principal_add;
-    const reinvest_mid = reinvested + reinvest_add;
-    const gains_mid = gains;
-
-    const total_pre_interest = principal_mid + reinvest_mid + gains_mid;
-    
     // 세제비적격은 공시이율 사용, 그 외는 적립기 펀드수익률(ratePre) 사용
     const currentRate = isNonTaxable ? rateInsurance : ratePre;
-    const growth_rate = currentRate / 100;
-    const growth_gain = total_pre_interest * growth_rate;
+    const annual_rate = currentRate / 100;
+    // 연복리 유효이자율 기준 월이율 계산 (EAR = 8% => (1.08)^(1/12) - 1)
+    const monthly_rate = Math.pow(1 + annual_rate, 1 / 12) - 1;
 
-    // 기말 정산
-    principal = principal_mid;
-    reinvested = reinvest_mid;
-    gains = gains_mid + growth_gain;
-    balance = principal + reinvested + gains;
+    for (let month = 1; month <= 12; month++) {
+      // 매월 초에 50만원씩 납입 (납입 대상일 때만)
+      const depositThisMonth = isPayingThisYear ? monthlyDeposit : 0;
+      
+      // 세액공제 환급금 수령 및 재투자는 매년 1월(첫번째 달) 초에 일시 반영
+      const reinvestThisMonth = (month === 1 && !isNonTaxable && reinvestTaxCredit && age > startAge) ? pendingTaxCredit : 0;
+
+      const principal_mid = principal + depositThisMonth;
+      const reinvest_mid = reinvested + reinvestThisMonth;
+      const gains_mid = gains;
+
+      const total_pre_interest = principal_mid + reinvest_mid + gains_mid;
+      const growth_gain = total_pre_interest * monthly_rate;
+
+      principal = principal_mid;
+      reinvested = reinvest_mid;
+      gains = gains_mid + growth_gain;
+      balance = principal + reinvested + gains;
+
+      yearInvestmentReturn += growth_gain;
+    }
 
     pendingTaxCredit = taxCreditThisYear;
 
@@ -188,7 +196,7 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
       withdrawnPreTax: 0,
       withdrawnAfterTax: 0,
       withdrawnTax: 0,
-      investmentReturn: growth_gain,
+      investmentReturn: yearInvestmentReturn,
       isAccumulation: true,
     });
   }
@@ -206,12 +214,14 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   if (isNonTaxable) {
     if (payoutMethod === "fixed") {
       if (retirementBalance > 0) {
-        const r = rateInsurance / 100;
-        const n = fixedTerm;
-        if (r > 0) {
-          withdrawnTarget = retirementBalance * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        const r_annual = rateInsurance / 100;
+        const rm = Math.pow(1 + r_annual, 1 / 12) - 1;
+        const totalMonths = fixedTerm * 12;
+        if (rm > 0) {
+          const pmt = retirementBalance * (rm * Math.pow(1 + rm, totalMonths)) / (Math.pow(1 + rm, totalMonths) - 1);
+          withdrawnTarget = pmt * 12;
         } else {
-          withdrawnTarget = retirementBalance / n;
+          withdrawnTarget = retirementBalance / fixedTerm;
         }
       } else {
         withdrawnTarget = 0;
@@ -245,125 +255,131 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
       }
     }
 
-    if (balance <= 0) {
-      if (depleteAge === null && (isLifetimeGuarantee || currentYearTarget > 0)) {
-        depleteAge = age;
-      }
-      
-      const targetPay = isLifetimeGuarantee ? withdrawnTarget : 0;
-      let afterTax = targetPay;
-      let tax = 0;
-      if (targetPay > 0 && !isNonTaxable) {
-        if (isHybrid) {
-          const basePortion = Math.min(targetPay, 1500);
-          const excessPortion = Math.max(0, targetPay - 1500);
-          tax = basePortion * 0.033 + excessPortion * 0.165;
-          afterTax = targetPay - tax;
-        } else {
-          const computedTax = calcAfterTax(targetPay, age);
-          afterTax = computedTax.afterTax;
-          tax = computedTax.tax;
-        }
-      }
+    let yearWithdrawnPreTax = 0;
+    let yearWithdrawnAfterTax = 0;
+    let yearWithdrawnTax = 0;
+    let yearInvestmentReturn = 0;
 
-      timeline.push({
-        age,
-        balance: 0,
-        principal: 0,
-        reinvested: 0,
-        gains: 0,
-        deposit: 0,
-        refund: 0,
-        withdrawnPreTax: targetPay,
-        withdrawnAfterTax: afterTax,
-        withdrawnTax: tax,
-        investmentReturn: 0,
-        isAccumulation: false,
-      });
-      continue;
-    }
-
-    // 인출기 투자 수익 발생 (세제비적격 및 하이브리드는 공시이율 사용, 일반 펀드는 ratePost 사용)
     const currentPostRate = (isNonTaxable || isHybrid) ? rateInsurance : ratePost;
-    const investmentReturn = balance * (currentPostRate / 100);
-    const gains_pre = gains + investmentReturn;
-    const balance_before_withdrawal = balance + investmentReturn;
+    const post_annual_rate = currentPostRate / 100;
+    const post_monthly_rate = Math.pow(1 + post_annual_rate, 1 / 12) - 1;
 
-    // 세전인출 정산
-    let withdrawnPreTax = currentYearTarget;
-    if (!isLifetimeGuarantee && balance_before_withdrawal < currentYearTarget) {
-      withdrawnPreTax = balance_before_withdrawal;
-    }
+    for (let month = 1; month <= 12; month++) {
+      const monthlyTarget = currentYearTarget / 12;
 
-    let afterTax = withdrawnPreTax;
-    let tax = 0;
+      if (balance <= 0) {
+        if (depleteAge === null && (isLifetimeGuarantee || currentYearTarget > 0)) {
+          depleteAge = age;
+        }
+        
+        const targetPay = isLifetimeGuarantee ? monthlyTarget : 0;
+        let monthAfterTax = targetPay;
+        let monthTax = 0;
+        if (targetPay > 0 && !isNonTaxable) {
+          if (isHybrid) {
+            const basePortion = Math.min(targetPay, 1500 / 12);
+            const excessPortion = Math.max(0, targetPay - (1500 / 12));
+            monthTax = basePortion * 0.033 + excessPortion * 0.165;
+            monthAfterTax = targetPay - monthTax;
+          } else {
+            const taxResult = calcAfterTax(targetPay * 12, age);
+            monthTax = taxResult.tax / 12;
+            monthAfterTax = targetPay - monthTax;
+          }
+        }
 
-    // 세제적격(펀드, 하이브리드) 상품에 대해서만 연금소득세 과세
-    if (!isNonTaxable && withdrawnPreTax > 0) {
-      if (isHybrid) {
-        const basePortion = Math.min(withdrawnPreTax, 1500);
-        const excessPortion = Math.max(0, withdrawnPreTax - 1500);
-        tax = basePortion * 0.033 + excessPortion * 0.165; // 하이브리드 종신연금형 연금소득세: 1500 이하는 3.3%, 초과분은 16.5% 적용
-        afterTax = withdrawnPreTax - tax;
-      } else {
-        const taxResult = calcAfterTax(withdrawnPreTax, age);
-        afterTax = taxResult.afterTax;
-        tax = taxResult.tax;
-      }
-    }
-
-    const balance_new = Math.max(0, balance_before_withdrawal - withdrawnPreTax);
-
-    if (balance_new <= 0) {
-      if (depleteAge === null) {
-        depleteAge = age;
-      }
-      balance = 0;
-      principal = 0;
-      reinvested = 0;
-      gains = 0;
-    } else {
-      // 차감 우선순위: ETF 수익금(gains) -> 세액공제 재투자분(reinvested) -> 납입 원금(principal)
-      let remainingWithdrawal = withdrawnPreTax;
-      let nextGains = gains_pre;
-      let nextReinvested = reinvested;
-      let nextPrincipal = principal;
-
-      // 1. ETF 수익금(이자)에서 우선 차감
-      if (remainingWithdrawal <= nextGains) {
-        nextGains -= remainingWithdrawal;
-        remainingWithdrawal = 0;
-      } else {
-        remainingWithdrawal -= nextGains;
-        nextGains = 0;
+        yearWithdrawnPreTax += targetPay;
+        yearWithdrawnAfterTax += monthAfterTax;
+        yearWithdrawnTax += monthTax;
+        continue;
       }
 
-      // 2. 남은 금액은 세액공제 재투자분에서 차감
-      if (remainingWithdrawal > 0) {
-        if (remainingWithdrawal <= nextReinvested) {
-          nextReinvested -= remainingWithdrawal;
-          remainingWithdrawal = 0;
+      // 월별 자산 성장 계산 후 월 초수령/말수령 처리 (연복리 유효이자율 분할 반영)
+      const monthInvestmentReturn = balance * post_monthly_rate;
+      const gains_pre = gains + monthInvestmentReturn;
+      const balance_before_withdrawal = balance + monthInvestmentReturn;
+
+      // 세전인출 정산
+      let monthWithdrawnPreTax = monthlyTarget;
+      if (!isLifetimeGuarantee && balance_before_withdrawal < monthlyTarget) {
+        monthWithdrawnPreTax = balance_before_withdrawal;
+      }
+
+      let monthAfterTax = monthWithdrawnPreTax;
+      let monthTax = 0;
+
+      // 세제적격(펀드, 하이브리드) 상품에 대해서만 연금소득세 과세
+      if (!isNonTaxable && monthWithdrawnPreTax > 0) {
+        if (isHybrid) {
+          const basePortion = Math.min(monthWithdrawnPreTax, 1500 / 12);
+          const excessPortion = Math.max(0, monthWithdrawnPreTax - (1500 / 12));
+          monthTax = basePortion * 0.033 + excessPortion * 0.165;
+          monthAfterTax = monthWithdrawnPreTax - monthTax;
         } else {
-          remainingWithdrawal -= nextReinvested;
-          nextReinvested = 0;
+          const taxResult = calcAfterTax(monthWithdrawnPreTax * 12, age);
+          monthTax = taxResult.tax / 12;
+          monthAfterTax = monthWithdrawnPreTax - monthTax;
         }
       }
 
-      // 3. 남은 금액은 납입 원금에서 차감
-      if (remainingWithdrawal > 0) {
-        if (remainingWithdrawal <= nextPrincipal) {
-          nextPrincipal -= remainingWithdrawal;
+      const balance_new = Math.max(0, balance_before_withdrawal - monthWithdrawnPreTax);
+
+      if (balance_new <= 0) {
+        if (depleteAge === null) {
+          depleteAge = age;
+        }
+        balance = 0;
+        principal = 0;
+        reinvested = 0;
+        gains = 0;
+      } else {
+        // 차감 우선순위: ETF 수익금(gains) -> 세액공제 재투자분(reinvested) -> 납입 원금(principal)
+        let remainingWithdrawal = monthWithdrawnPreTax;
+        let nextGains = gains_pre;
+        let nextReinvested = reinvested;
+        let nextPrincipal = principal;
+
+        // 1. ETF 수익금(이자)에서 우선 차감
+        if (remainingWithdrawal <= nextGains) {
+          nextGains -= remainingWithdrawal;
           remainingWithdrawal = 0;
         } else {
-          remainingWithdrawal -= nextPrincipal;
-          nextPrincipal = 0;
+          remainingWithdrawal -= nextGains;
+          nextGains = 0;
         }
+
+        // 2. 남은 금액은 세액공제 재투자분에서 차감
+        if (remainingWithdrawal > 0) {
+          if (remainingWithdrawal <= nextReinvested) {
+            nextReinvested -= remainingWithdrawal;
+            remainingWithdrawal = 0;
+          } else {
+            remainingWithdrawal -= nextReinvested;
+            nextReinvested = 0;
+          }
+        }
+
+        // 3. 남은 금액은 납입 원금에서 차감
+        if (remainingWithdrawal > 0) {
+          if (remainingWithdrawal <= nextPrincipal) {
+            nextPrincipal -= remainingWithdrawal;
+            remainingWithdrawal = 0;
+          } else {
+            remainingWithdrawal -= nextPrincipal;
+            nextPrincipal = 0;
+          }
+        }
+
+        principal = nextPrincipal;
+        reinvested = nextReinvested;
+        gains = nextGains;
+        balance = balance_new;
       }
 
-      principal = nextPrincipal;
-      reinvested = nextReinvested;
-      gains = nextGains;
-      balance = balance_new;
+      yearWithdrawnPreTax += monthWithdrawnPreTax;
+      yearWithdrawnAfterTax += monthAfterTax;
+      yearWithdrawnTax += monthTax;
+      yearInvestmentReturn += monthInvestmentReturn;
     }
 
     timeline.push({
@@ -374,10 +390,10 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
       gains,
       deposit: 0,
       refund: 0,
-      withdrawnPreTax,
-      withdrawnAfterTax: afterTax,
-      withdrawnTax: tax,
-      investmentReturn,
+      withdrawnPreTax: yearWithdrawnPreTax,
+      withdrawnAfterTax: yearWithdrawnAfterTax,
+      withdrawnTax: yearWithdrawnTax,
+      investmentReturn: yearInvestmentReturn,
       isAccumulation: false,
     });
   }

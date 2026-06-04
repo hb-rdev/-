@@ -5,6 +5,7 @@ import MetricsCards from "./components/MetricsCards";
 import Charts from "./components/Charts";
 import DetailsTable from "./components/DetailsTable";
 import TaxGuide from "./components/TaxGuide";
+import ComparisonPanel from "./components/ComparisonPanel";
 import { SimulationInputs } from "./types";
 import { runSimulation } from "./utils";
 import { 
@@ -16,21 +17,21 @@ import {
   CheckCircle,
   HelpCircle,
   PiggyBank,
-  ShieldCheck
+  ShieldCheck,
+  Scale
 } from "lucide-react";
 
 export default function App() {
-  const [isPhoneFrame, setIsPhoneFrame] = useState(true);
-  const [activeTab, setActiveTab] = useState<string>("simulator");
+  const [activeTab, setActiveTab] = useState<string>("compare");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   // State initialized with precise financial default values
   const [inputs, setInputs] = useState<SimulationInputs>({
     monthlyDeposit: 50,      // 만원
-    startAge: 35,          // 세
-    endAge: 55,            // 세
-    depositYears: 20,      // 년 (55 - 35 = 20년)
-    ratePre: 7.0,          // %
+    startAge: 25,          // 세 (user request: 25세)
+    endAge: 60,            // 세 (user request: 60세)
+    depositYears: 35,      // 년 (60 - 25 = 35년)
+    ratePre: 8.0,          // % (user request: 8% 적립기수익률)
     ratePost: 5.0,         // %
     annualWithdrawal: 1500, // 만원
     reinvestTaxCredit: true,
@@ -131,8 +132,6 @@ export default function App() {
     <DeviceShell
       activeTab={activeTab}
       onTabChange={setActiveTab}
-      isPhoneFrame={isPhoneFrame}
-      setIsPhoneFrame={setIsPhoneFrame}
       theme={theme}
       onThemeChange={setTheme}
     >
@@ -188,10 +187,18 @@ export default function App() {
 
         {/* Dynamic Inner Tab View */}
         <div className="p-4 md:p-5 flex-1 min-h-0">
+          {activeTab === "compare" && (
+            <ComparisonPanel
+              inputs={inputs}
+              onInputChange={handleInputChange}
+              theme={theme}
+            />
+          )}
+
           {activeTab === "simulator" && (
-            <div className={`grid gap-4 ${isPhoneFrame ? "grid-cols-1" : "lg:grid-cols-12 lg:items-start"}`}>
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-12 lg:items-start">
               {/* Left Side: Inputs and settings */}
-              <div className={isPhoneFrame ? "space-y-4" : "lg:col-span-4 space-y-4 lg:sticky lg:top-[76px]"}>
+              <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-[76px]">
                 {/* Dynamic sliders & inputs panel */}
                 <InputPanel 
                   inputs={inputs} 
@@ -205,7 +212,7 @@ export default function App() {
               </div>
 
               {/* Right Side: KPIs and Charts */}
-              <div className={isPhoneFrame ? "space-y-4" : "lg:col-span-8 space-y-4"}>
+              <div className="lg:col-span-8 space-y-4">
                 {/* KPIs (Summary cards) */}
                 <MetricsCards
                   retirementBalance={result.retirementBalance}
@@ -305,42 +312,55 @@ export default function App() {
             : "bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-lg text-slate-800"
         }`}>
           <button
+            onClick={() => setActiveTab("compare")}
+            id="tab-compare"
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all cursor-pointer ${
+              activeTab === "compare"
+                ? isDark ? "text-indigo-400 font-bold scale-102" : "text-indigo-650 font-black scale-102"
+                : isDark ? "text-slate-500 hover:text-slate-300 font-medium" : "text-slate-400 hover:text-slate-650 font-semibold"
+            }`}
+          >
+            <Scale className="w-4.5 h-4.5" />
+            <span className="text-[10px] mt-1 font-bold">3대상품 비교분석</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("simulator")}
             id="tab-simulator"
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all ${
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all cursor-pointer ${
               activeTab === "simulator"
                 ? isDark ? "text-indigo-400 font-bold scale-102" : "text-indigo-650 font-black scale-102"
                 : isDark ? "text-slate-500 hover:text-slate-300 font-medium" : "text-slate-400 hover:text-slate-650 font-semibold"
             }`}
           >
             <Calculator className="w-4.5 h-4.5" />
-            <span className="text-[10px] mt-1">시뮬레이터</span>
+            <span className="text-[10px] mt-1 font-bold">개별 시뮬레이터</span>
           </button>
           
           <button
             onClick={() => setActiveTab("table")}
             id="tab-table"
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all ${
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all cursor-pointer ${
               activeTab === "table"
                 ? isDark ? "text-indigo-400 font-bold scale-102" : "text-indigo-650 font-black scale-102"
                 : isDark ? "text-slate-500 hover:text-slate-300 font-medium" : "text-slate-400 hover:text-slate-650 font-semibold"
             }`}
           >
             <Table className="w-4.5 h-4.5" />
-            <span className="text-[10px] mt-1">연도별 원장</span>
+            <span className="text-[10px] mt-1 font-bold">연도별 원장</span>
           </button>
 
           <button
             onClick={() => setActiveTab("guide")}
             id="tab-guide"
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all ${
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-all cursor-pointer ${
               activeTab === "guide"
                 ? isDark ? "text-indigo-400 font-bold scale-102" : "text-indigo-650 font-black scale-102"
                 : isDark ? "text-slate-500 hover:text-slate-300 font-medium" : "text-slate-400 hover:text-slate-650 font-semibold"
             }`}
           >
             <BookOpen className="w-4.5 h-4.5" />
-            <span className="text-[10px] mt-1">세무 가이드</span>
+            <span className="text-[10px] mt-1 font-bold">세무 가이드</span>
           </button>
         </nav>
       </div>

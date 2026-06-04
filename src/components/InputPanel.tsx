@@ -151,12 +151,12 @@ export default function InputPanel({
           icon: <TrendingUp className="w-3.5 h-3.5 text-indigo-400" />,
           min: 2,
           max: 15,
-          step: 0.5,
+          step: 0.1,
           unit: "%",
           key: "ratePre" as keyof SimulationInputs,
           colorClass: "text-[#6366f1]",
           bgColorClass: "bg-indigo-500/10",
-          stepDelta: 0.5,
+          stepDelta: 0.1,
         };
       case "ratePost":
         return {
@@ -164,12 +164,12 @@ export default function InputPanel({
           icon: <TrendingDown className="w-3.5 h-3.5 text-indigo-400" />,
           min: 1,
           max: 15,
-          step: 0.5,
+          step: 0.1,
           unit: "%",
           key: "ratePost" as keyof SimulationInputs,
           colorClass: "text-[#64748b]",
           bgColorClass: "bg-slate-500/10",
-          stepDelta: 0.5,
+          stepDelta: 0.1,
         };
       case "rateInsurance":
         return {
@@ -199,7 +199,7 @@ export default function InputPanel({
         };
       case "insuranceAnnuityRate":
         return {
-          title: "종신연금비율",
+          title: "표준 종신지급률",
           icon: <DollarSign className="w-3.5 h-3.5 text-[#A7AAE1]" />,
           min: 2.0,
           max: 7.0,
@@ -212,7 +212,7 @@ export default function InputPanel({
         };
       case "illHealthEffect":
         return {
-          title: "유병자연금 효과",
+          title: "유병자 효과",
           icon: <Percent className="w-3.5 h-3.5 text-[#A7AAE1]" />,
           min: 100,
           max: 150,

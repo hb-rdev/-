@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Smartphone, Monitor, Battery, Wifi, Signal, Sun, Moon } from "lucide-react";
+import React from "react";
+import { Monitor, Sun, Moon } from "lucide-react";
 
 interface DeviceShellProps {
   children: React.ReactNode;
   activeTab: string;
   onTabChange: (tab: string) => void;
-  isPhoneFrame: boolean;
-  setIsPhoneFrame: (b: boolean) => void;
   theme: "dark" | "light";
   onThemeChange: (theme: "dark" | "light") => void;
 }
@@ -15,25 +13,9 @@ export default function DeviceShell({
   children,
   activeTab,
   onTabChange,
-  isPhoneFrame,
-  setIsPhoneFrame,
   theme,
   onThemeChange,
 }: DeviceShellProps) {
-  const [time, setTime] = useState("09:41");
-
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      let hours = now.getHours().toString().padStart(2, "0");
-      let minutes = now.getMinutes().toString().padStart(2, "0");
-      setTime(`${hours}:${minutes}`);
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 60000);
-    return () => clearInterval(timer);
-  }, []);
-
   const isDark = theme === "dark";
 
   return (
@@ -48,7 +30,7 @@ export default function DeviceShell({
       }`}>
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-indigo-500/20">
-            <Smartphone className="w-6 h-6 text-white" />
+            <Monitor className="w-6 h-6 text-white" />
           </div>
           <div>
             <h1 className={`text-xl font-extrabold tracking-tight ${
@@ -59,12 +41,12 @@ export default function DeviceShell({
               연금저축 시뮬레이터 Pro
             </h1>
             <p className={`text-xs font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              React Native 하이브리드 엔진
+              3대 노후상품 정밀 비교 및 분석 엔진
             </p>
           </div>
         </div>
 
-        {/* Controls Section (Theme Switcher & Device Screen Layout Split) */}
+        {/* Controls Section (Theme Switcher Button) */}
         <div className="flex items-center space-x-3">
           {/* Black & White Premium Mode Switcher Button */}
           <div className={`flex items-center p-1 rounded-xl border transition-colors ${
@@ -72,7 +54,7 @@ export default function DeviceShell({
           }`}>
             <button
               onClick={() => onThemeChange("light")}
-              className={`p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center ${
+              className={`p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center cursor-pointer ${
                 !isDark 
                   ? "bg-white text-amber-500 shadow-xs scale-102 font-bold" 
                   : "text-slate-500 hover:text-slate-350"
@@ -83,7 +65,7 @@ export default function DeviceShell({
             </button>
             <button
               onClick={() => onThemeChange("dark")}
-              className={`p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center ${
+              className={`p-1.5 rounded-lg transition-all duration-200 flex items-center justify-center cursor-pointer ${
                 isDark 
                   ? "bg-indigo-600 text-white shadow-xs scale-102 font-bold" 
                   : "text-slate-400 hover:text-slate-600"
@@ -93,92 +75,22 @@ export default function DeviceShell({
               <Moon className="w-4 h-4" />
             </button>
           </div>
-
-          {/* Device Mockup Segmented Toggle */}
-          <div className={`flex items-center p-1 rounded-xl border transition-colors ${
-            isDark ? "bg-slate-900 border-slate-800" : "bg-slate-100 border-slate-200"
-          }`}>
-            <button
-              onClick={() => setIsPhoneFrame(true)}
-              id="toggle-phone-frame"
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-205 ${
-                isPhoneFrame
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>모바일 앱</span>
-            </button>
-            <button
-              onClick={() => setIsPhoneFrame(false)}
-              id="toggle-desktop-frame"
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-205 ${
-                !isPhoneFrame
-                  ? "bg-indigo-600 text-white shadow-xs"
-                  : isDark ? "text-slate-400 hover:text-white" : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <Monitor className="w-3.5 h-3.5" />
-              <span>데스크탑 뷰</span>
-            </button>
-          </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Content Area - Broad Desktop Layout */}
       <main className={`flex-1 flex items-center justify-center py-6 px-4 md:py-10 transition-colors duration-300 ${
         isDark 
           ? "bg-radial-at-t from-slate-900 via-slate-950 to-slate-950" 
-          : "bg-slate-100"
+          : "bg-radial-at-t from-slate-50 via-slate-100 to-slate-100"
       }`}>
-        {isPhoneFrame ? (
-          /* Phone Frame Mockup */
-          <div className={`relative w-full max-w-[430px] h-[880px] rounded-[48px] p-3.5 border-4 transition-all duration-300 overflow-hidden flex flex-col ${
-            isDark 
-              ? "bg-slate-950 border-slate-800 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] ring-1 ring-white/10" 
-              : "bg-slate-900 border-slate-700 shadow-xl"
-          }`}>
-            {/* Camera Dynamic Island / Notch */}
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-full z-50 flex items-center justify-between px-4 ring-1 ring-white/5">
-              <div className="w-1.5 h-1.5 bg-indigo-500/80 rounded-full animate-pulse"></div>
-              <div className="w-3.5 h-1.5 bg-zinc-800 rounded-full"></div>
-            </div>
-
-            {/* Simulated Phone Status Bar */}
-            <div className={`w-full h-8 flex items-center justify-between px-6 text-xs z-40 pt-1 font-semibold select-none ${
-              isDark ? "text-white/90" : "text-white/95"
-            }`}>
-              <span>{time}</span>
-              <div className="flex items-center space-x-1.5">
-                <Signal className="w-3.5 h-3.5" />
-                <Wifi className="w-3.5 h-3.5" />
-                <Battery className="w-4 h-4 ml-0.5" />
-              </div>
-            </div>
-
-            {/* Phone Screen App Container */}
-            <div className={`flex-1 rounded-[34px] overflow-y-auto flex flex-col relative overflow-hidden pb-16 transition-colors duration-300 ${
-              isDark ? "bg-slate-900 border border-slate-800/50" : "bg-slate-50 border border-slate-200"
-            }`}>
-              {children}
-            </div>
-
-            {/* iOS Home Indicator Bar */}
-            <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 rounded-full pointer-events-none z-50 ${
-              isDark ? "bg-white/40" : "bg-white/50"
-            }`}></div>
+        <div className={`w-full max-w-7xl border rounded-2xl shadow-2xl overflow-hidden min-h-[750px] flex flex-col transition-all duration-300 ${
+          isDark ? "bg-slate-900/90 border-slate-800/95" : "bg-white border-slate-200"
+        }`}>
+          <div className="flex-1 overflow-y-auto flex flex-col">
+            {children}
           </div>
-        ) : (
-          /* Broad Desktop Layout */
-          <div className={`w-full max-w-6xl border rounded-2xl shadow-2xl overflow-hidden min-h-[750px] flex flex-col transition-all duration-300 ${
-            isDark ? "bg-slate-900 border-slate-800/90" : "bg-white border-slate-180"
-          }`}>
-            <div className="flex-1 overflow-y-auto flex flex-col">
-              {children}
-            </div>
-          </div>
-        )}
+        </div>
       </main>
 
       {/* Footer Meta Credits */}
