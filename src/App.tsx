@@ -23,7 +23,7 @@ import {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("compare");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">("light");
 
   // State initialized with precise financial default values
   const [inputs, setInputs] = useState<SimulationInputs>({

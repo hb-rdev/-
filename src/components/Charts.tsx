@@ -187,7 +187,7 @@ function getNiceTicksAndMax(maxVal: number, targetTicks: number = 5): { ticks: n
   return { ticks, max: niceMaxVal };
 }
 
-export default function Charts({ chart1Data, chart2Data, startAge, endAge, theme = "dark" }: ChartsProps) {
+export default function Charts({ chart1Data, chart2Data, startAge, endAge, theme = "light" }: ChartsProps) {
   const isDark = theme === "dark";
 
   // Compute flexible nice max height and tick intervals dynamically to prevent crowding

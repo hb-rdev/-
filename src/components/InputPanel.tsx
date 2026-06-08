@@ -36,7 +36,7 @@ export default function InputPanel({
   annualRefund,
   reinvestmentEffect,
   cumulativeRefund,
-  theme = "dark" 
+  theme = "light" 
 }: InputPanelProps) {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   

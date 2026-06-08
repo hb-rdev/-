@@ -41,7 +41,7 @@ export default function MetricsCards({
   annualWithdrawal,
   preTaxWithdrawal,
   inputs,
-  theme = "dark",
+  theme = "light",
 }: MetricsCardsProps) {
   const isDark = theme === "dark";
   const startAge = inputs.endAge; // This is the start of withdrawal age

@@ -8,7 +8,7 @@ interface DetailsTableProps {
   theme?: "dark" | "light";
 }
 
-export default function DetailsTable({ timeline, theme = "dark" }: DetailsTableProps) {
+export default function DetailsTable({ timeline, theme = "light" }: DetailsTableProps) {
   const [showFull, setShowFull] = useState(false);
   const isDark = theme === "dark";
 

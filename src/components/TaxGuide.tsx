@@ -14,7 +14,7 @@ interface TaxGuideProps {
   theme?: "dark" | "light";
 }
 
-export default function TaxGuide({ theme = "dark" }: TaxGuideProps) {
+export default function TaxGuide({ theme = "light" }: TaxGuideProps) {
   const isDark = theme === "dark";
 
   return (

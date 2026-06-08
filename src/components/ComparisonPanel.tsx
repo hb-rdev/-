@@ -31,7 +31,7 @@ interface ComparisonPanelProps {
 export default function ComparisonPanel({ 
   inputs, 
   onInputChange, 
-  theme = "dark" 
+  theme = "light" 
 }: ComparisonPanelProps) {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   
@@ -150,21 +150,12 @@ export default function ComparisonPanel({
           ? "bg-slate-900 border-slate-800" 
           : "bg-white border-slate-250 shadow-xs"
       }`}>
-        <div className="flex items-center space-x-2 border-b pb-3 mb-5 border-dashed"
-             style={{ borderColor: isDark ? "rgba(71, 85, 105, 0.4)" : "rgba(226, 232, 240, 1)" }}>
-          <Sparkles className={`w-5 h-5 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
-          <h3 className={`text-sm font-black tracking-tight uppercase ${isDark ? "text-slate-100" : "text-slate-800"}`}>
-            시뮬레이션 가입 조건 통합 설정 콘솔
-          </h3>
-        </div>
-
-        {/* Outer Grid split: Common vs Product Specific */}
-        <div className="flex flex-col lg:flex-row gap-5 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
           
-          {/* LEFT: 공통 가입 조건 */}
-          <div className="flex-1 lg:flex-[1_2.5_0%] lg:min-w-[280px] lg:max-w-[325px] flex flex-col">
+          {/* Column 1: 공통 가입 조건 */}
+          <div className="flex flex-col">
             <div className="flex items-center h-8 mb-2">
-              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+              <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full ${
                 isDark ? "bg-[#696FC7]/15 text-[#A7AAE1]" : "bg-indigo-50 text-indigo-700"
               }`}>
                 공통 가입 조건
@@ -173,13 +164,13 @@ export default function ComparisonPanel({
 
             <div className={`p-4 rounded-xl border flex-1 flex flex-col justify-between ${
                isDark ? "bg-slate-950/45 border-slate-800/80" : "bg-slate-50 border-slate-200"
-            }`} style={{ minHeight: "330px" }}>
+            }`}>
               <div className="space-y-4">
                 {/* 월 납입액 */}
                 <div className="space-y-1 relative">
                   <div className="flex items-center justify-between text-[10px] font-bold">
                     <span className="flex items-center text-slate-450 text-[9.5px]">
-                      <Coins className="w-3.5 h-3.5 mr-1 text-indigo-400 shrink-0" />
+                      <Coins className="w-3.5 h-3.5 mr-1 text-indigo-405 shrink-0" />
                       월 납입액
                       <button type="button" onClick={(e) => showHelp(e, "monthlyDeposit")} className="text-slate-500 hover:text-indigo-400 ml-1">
                         <HelpCircle className="w-3 h-3" />
@@ -205,7 +196,7 @@ export default function ComparisonPanel({
                 <div className="space-y-1 relative">
                   <div className="flex items-center justify-between text-[10px] font-bold">
                     <span className="flex items-center text-slate-450 truncate text-[9.5px]">
-                      <User className="w-3.5 h-3.5 mr-1 text-indigo-400 shrink-0" />
+                      <User className="w-3.5 h-3.5 mr-1 text-indigo-405 shrink-0" />
                       시작 나이
                     </span>
                     <span className={`font-mono font-black text-[10.5px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
@@ -219,39 +210,42 @@ export default function ComparisonPanel({
                   </div>
                 </div>
 
-                {/* 개시 나이 */}
-                <div className="space-y-1 relative">
-                  <div className="flex items-center justify-between text-[10px] font-bold">
-                    <span className="flex items-center text-slate-450 truncate text-[9.5px]">
-                      <Hourglass className="w-3.5 h-3.5 mr-1 text-indigo-400 shrink-0" />
-                      개시 나이
-                    </span>
-                    <span className={`font-mono font-black text-[10.5px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                      {inputs.endAge}세
-                    </span>
+                {/* 개시 나이 + 납입 기간 코어설정 1x2 그리드 */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* 개시 나이 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold">
+                      <span className="text-slate-450 truncate text-[9px] flex items-center">
+                        <Hourglass className="w-2.5 h-2.5 mr-0.5 text-indigo-405 shrink-0" />
+                        개시 나이
+                      </span>
+                      <span className={`font-mono font-black text-[10.5px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                        {inputs.endAge}세
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-1 pt-1.5">
+                      {renderMiniAdjustBtn(() => adj("endAge", -1, 55, 70), false, "hover:bg-indigo-600 hover:border-indigo-600 hover:text-white")}
+                      {renderSlider(inputs.endAge, 55, 70, 1, (val) => onInputChange({ endAge: val }), "#6366f1")}
+                      {renderMiniAdjustBtn(() => adj("endAge", 1, 55, 70), true, "hover:bg-indigo-600 hover:border-indigo-600 hover:text-white")}
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1.5 pt-1.5">
-                    {renderAdjustBtn(() => adj("endAge", -1, 55, 70), false)}
-                    {renderSlider(inputs.endAge, 55, 70, 1, (val) => onInputChange({ endAge: val }), "#6366f1")}
-                    {renderAdjustBtn(() => adj("endAge", 1, 55, 70), true)}
-                  </div>
-                </div>
 
-                {/* 납입 기간 */}
-                <div className="space-y-1 relative">
-                  <div className="flex items-center justify-between text-[10px] font-bold">
-                    <span className="flex items-center text-slate-450 truncate text-[9.5px]">
-                      <Hourglass className="w-3.5 h-3.5 mr-1 text-indigo-400 shrink-0" />
-                      납입 기간
-                    </span>
-                    <span className={`font-mono text-[10.5px] text-slate-400 font-extrabold ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                      {inputs.depositYears}년 <span className="text-[9px] text-slate-400 font-bold ml-1">({inputs.startAge + inputs.depositYears}세 완납)</span>
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-1.5 pt-1.5">
-                    {renderAdjustBtn(() => adj("depositYears", -1, 1, inputs.endAge - inputs.startAge), false)}
-                    {renderSlider(inputs.depositYears, 1, Math.max(1, inputs.endAge - inputs.startAge), 1, (val) => onInputChange({ depositYears: val }), "#6366f1")}
-                    {renderAdjustBtn(() => adj("depositYears", 1, 1, inputs.endAge - inputs.startAge), true)}
+                  {/* 납입 기간 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold">
+                      <span className="text-slate-450 truncate text-[9px] flex items-center">
+                        <Hourglass className="w-2.5 h-2.5 mr-0.5 text-indigo-405 shrink-0" />
+                        납입 기간
+                      </span>
+                      <span className={`font-mono text-[10.5px] text-slate-400 font-extrabold ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                        {inputs.depositYears}년
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-1 pt-1.5">
+                      {renderMiniAdjustBtn(() => adj("depositYears", -1, 1, inputs.endAge - inputs.startAge), false, "hover:bg-indigo-600 hover:border-indigo-600 hover:text-white")}
+                      {renderSlider(inputs.depositYears, 1, Math.max(1, inputs.endAge - inputs.startAge), 1, (val) => onInputChange({ depositYears: val }), "#6366f1")}
+                      {renderMiniAdjustBtn(() => adj("depositYears", 1, 1, inputs.endAge - inputs.startAge), true, "hover:bg-indigo-600 hover:border-indigo-600 hover:text-white")}
+                    </div>
                   </div>
                 </div>
 
@@ -259,297 +253,320 @@ export default function ComparisonPanel({
                 <div className="space-y-1 relative">
                   <div className="flex items-center justify-between text-[10px] font-bold">
                     <span className="flex items-center text-slate-450 truncate text-[9.5px]">
-                      <Percent className="w-3.5 h-3.5 mr-1 text-indigo-400 shrink-0" />
+                      <Percent className="w-3.5 h-3.5 mr-1 text-indigo-405 shrink-0" />
                       소득형태별 공제율
                     </span>
                   </div>
                   <div className={`grid grid-cols-2 gap-1 p-0.5 rounded-lg border ${isDark ? "bg-slate-900 border-slate-850" : "bg-white border-slate-200"}`}>
-                    <button type="button" onClick={() => onInputChange({ taxCreditRate: 13.2 })} className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${inputs.taxCreditRate === 13.2 ? "bg-indigo-600 text-white shadow-xs" : "text-slate-450 hover:text-indigo-400"}`}>13.2%</button>
-                    <button type="button" onClick={() => onInputChange({ taxCreditRate: 16.5 })} className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${inputs.taxCreditRate === 16.5 ? "bg-indigo-600 text-white shadow-xs" : "text-slate-450 hover:text-indigo-400"}`}>16.5%</button>
+                    <button type="button" onClick={() => onInputChange({ taxCreditRate: 13.2 })} className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${inputs.taxCreditRate === 13.2 ? "bg-indigo-600 text-white shadow-xs" : "text-slate-450 hover:text-indigo-455"}`}>13.2%</button>
+                    <button type="button" onClick={() => onInputChange({ taxCreditRate: 16.5 })} className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${inputs.taxCreditRate === 16.5 ? "bg-indigo-600 text-white shadow-xs" : "text-slate-450 hover:text-indigo-455"}`}>16.5%</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: 상품별 개별 조건 */}
-          <div className="lg:flex-[4_1_0%] lg:min-w-[700px] flex flex-col">
+          {/* Column 2: 연금저축펀드 */}
+          <div className="flex flex-col">
             <div className="flex items-center h-8 mb-2">
-              <span className={`text-xs font-black px-2.5 py-0.5 rounded-full inline-block ${
-                isDark ? "bg-[#A7AAE1]/15 text-[#A7AAE1]" : "bg-slate-150 text-slate-700"
+              <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full inline-block ${
+                isDark ? "bg-[#696FC7]/15 text-[#A7AAE1]" : "bg-slate-100 text-slate-700"
               }`}>
-                시뮬레이션 개별 설정
+                연금저축펀드
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 flex-1 select-none">
-              
-              {/* Product 1: 연금저축펀드 */}
-              <div className={`p-3.5 rounded-xl border relative overflow-hidden flex flex-col justify-between md:min-w-[225px] ${
-                isDark ? "bg-[#696FC7]/5 border-[#696FC7]/30" : "bg-indigo-50/30 border-indigo-150"
-              }`}>
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-indigo-500"></div>
-                <div>
-                  <h4 className="text-[11px] font-black text-indigo-500 mb-2.5 flex items-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-1"></span>
-                    연금저축펀드
-                  </h4>
-                  <div className="space-y-4">
-                    {/* 적립기/인출기 수익률 가로 1x2 배열 */}
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {/* 적립기 수익률 */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-[10px] font-bold">
-                          <span className="text-slate-400">적립기수익률</span>
-                          <span className="font-mono text-indigo-505 font-black">{inputs.ratePre.toFixed(1)}%</span>
-                        </div>
-                        <div className="flex items-center space-x-1.5 pt-1.5">
-                          {renderMiniAdjustBtn(() => adj("ratePre", -0.1, 2, 15), false, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
-                          {renderSlider(inputs.ratePre, 2, 15, 0.1, (val) => onInputChange({ ratePre: val }), "#6366f1")}
-                          {renderMiniAdjustBtn(() => adj("ratePre", 0.1, 2, 15), true, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
-                        </div>
-                      </div>
-
-                      {/* 인출기 수익률 */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-[10px] font-bold">
-                          <span className="text-slate-400">인출기수익률</span>
-                          <span className="font-mono text-indigo-505 font-black">{inputs.ratePost.toFixed(1)}%</span>
-                        </div>
-                        <div className="flex items-center space-x-1.5 pt-1.5">
-                          {renderMiniAdjustBtn(() => adj("ratePost", -0.1, 1, 15), false, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
-                          {renderSlider(inputs.ratePost, 1, 15, 0.1, (val) => onInputChange({ ratePost: val }), "#6366f1")}
-                          {renderMiniAdjustBtn(() => adj("ratePost", 0.1, 1, 15), true, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
-                        </div>
-                      </div>
+            <div className={`p-4 rounded-xl border relative overflow-hidden flex-1 flex flex-col justify-between ${
+              isDark ? "bg-[#696FC7]/5 border-[#696FC7]/30" : "bg-indigo-50/20 border-indigo-150"
+            }`}>
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-indigo-500"></div>
+              <div className="space-y-4">
+                {/* 적립기/인출기 수익률 가로 1x2 배열 */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* 적립기 수익률 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold">
+                      <span className="text-slate-400">적립기수익률</span>
+                      <span className={`font-mono font-black ${isDark ? "text-indigo-400" : "text-indigo-600"}`}>{inputs.ratePre.toFixed(1)}%</span>
                     </div>
-
-                    {/* 연 희망 입출액 */}
-                    <div className="h-[45px] flex flex-col justify-between">
-                      <div className="flex justify-between text-[10px] font-bold">
-                        <span className="text-slate-400">희망수령 연액</span>
-                        <span className="font-mono text-indigo-505 font-black">
-                          {inputs.annualWithdrawal}만 <span className="text-[9px] font-bold text-indigo-400">({fundResult.retirementBalance > 0 ? ((inputs.annualWithdrawal / fundResult.retirementBalance) * 100).toFixed(1) : 0}%)</span>
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-1.5">
-                        {renderAdjustBtn(() => adj("annualWithdrawal", -100, 500, 6000), false)}
-                        {renderSlider(inputs.annualWithdrawal, 500, 6000, 100, (val) => onInputChange({ annualWithdrawal: val }), "#6366f1")}
-                        {renderAdjustBtn(() => adj("annualWithdrawal", 100, 500, 6000), true)}
-                      </div>
+                    <div className="flex items-center space-x-1 pt-1.5">
+                      {renderMiniAdjustBtn(() => adj("ratePre", -0.1, 2, 15), false, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
+                      {renderSlider(inputs.ratePre, 2, 15, 0.1, (val) => onInputChange({ ratePre: val }), "#6366f1")}
+                      {renderMiniAdjustBtn(() => adj("ratePre", 0.1, 2, 15), true, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
                     </div>
+                  </div>
 
-                    {/* 세액공제 재투자 전략 */}
-                    <div className={`flex flex-col space-y-1 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                      <span className="text-[10px] text-slate-400 font-bold block mb-1">세액공제 재투자 전략</span>
-                      <div className={`grid grid-cols-2 gap-1 p-0.5 bg-slate-950/20 rounded-md border text-center ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                        <button
-                          type="button"
-                          onClick={() => onInputChange({ reinvestTaxCredit: true })}
-                          className={`py-1 text-[9.5px] font-black rounded cursor-pointer transition-all ${
-                            inputs.reinvestTaxCredit
-                              ? "bg-indigo-650 text-white shadow-xs"
-                              : "text-slate-500 hover:text-indigo-400"
-                          }`}
-                        >
-                          ON
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onInputChange({ reinvestTaxCredit: false })}
-                          className={`py-1 text-[9.5px] font-black rounded cursor-pointer transition-all ${
-                            !inputs.reinvestTaxCredit
-                              ? "bg-indigo-650 text-white shadow-xs"
-                              : "text-slate-500 hover:text-indigo-400"
-                          }`}
-                        >
-                          OFF
-                        </button>
-                      </div>
+                  {/* 인출기 수익률 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold">
+                      <span className="text-slate-400">인출기수익률</span>
+                      <span className={`font-mono font-black ${isDark ? "text-indigo-400" : "text-indigo-600"}`}>{inputs.ratePost.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex items-center space-x-1 pt-1.5">
+                      {renderMiniAdjustBtn(() => adj("ratePost", -0.1, 1, 15), false, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
+                      {renderSlider(inputs.ratePost, 1, 15, 0.1, (val) => onInputChange({ ratePost: val }), "#6366f1")}
+                      {renderMiniAdjustBtn(() => adj("ratePost", 0.1, 1, 15), true, "hover:bg-indigo-650 hover:border-indigo-650 hover:text-white")}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Product 2: 세제비적격 연금보험 */}
-              <div className={`p-3.5 rounded-xl border relative overflow-hidden flex flex-col justify-between md:min-w-[225px] ${
-                isDark ? "bg-[#F2AEBB]/5 border-[#F2AEBB]/30" : "bg-rose-50/30 border-rose-150"
+                {/* 연 희망 입출액 */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold">
+                    <span className="text-slate-400">희망수령 연액</span>
+                    <span className={`font-mono font-black ${isDark ? "text-indigo-400" : "text-indigo-600"}`}>
+                      {inputs.annualWithdrawal}만 <span className="text-[9px] font-bold text-indigo-400">({fundResult.retirementBalance > 0 ? ((inputs.annualWithdrawal / fundResult.retirementBalance) * 100).toFixed(1) : 0}%)</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-1.5 pt-1">
+                    {renderAdjustBtn(() => adj("annualWithdrawal", -100, 500, 6000), false)}
+                    {renderSlider(inputs.annualWithdrawal, 500, 6000, 100, (val) => onInputChange({ annualWithdrawal: val }), "#6366f1")}
+                    {renderAdjustBtn(() => adj("annualWithdrawal", 100, 500, 6000), true)}
+                  </div>
+                </div>
+
+                {/* 세액공제 재투자 전략 */}
+                <div className={`flex flex-col space-y-1 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                  <span className="text-[10px] text-slate-400 font-bold block mb-1">세액공제 재투자 전략</span>
+                  <div className={`grid grid-cols-2 gap-1 p-0.5 rounded-lg border ${isDark ? "bg-slate-900 border-slate-850" : "bg-white border-slate-200"}`}>
+                    <button
+                      type="button"
+                      onClick={() => onInputChange({ reinvestTaxCredit: true })}
+                      className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${
+                        inputs.reinvestTaxCredit
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-450 hover:text-indigo-400"
+                      }`}
+                    >
+                      ON
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onInputChange({ reinvestTaxCredit: false })}
+                      className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${
+                        !inputs.reinvestTaxCredit
+                          ? "bg-indigo-600 text-white shadow-xs"
+                          : "text-slate-450 hover:text-indigo-400"
+                      }`}
+                    >
+                      OFF
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3: 세제비적격 연금보험 */}
+          <div className="flex flex-col">
+            <div className="flex items-center h-8 mb-2">
+              <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full inline-block ${
+                isDark ? "bg-rose-500/10 text-rose-455" : "bg-slate-100 text-slate-700"
               }`}>
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-rose-400"></div>
-                <div>
-                  <h4 className="text-[11px] font-black text-rose-455 mb-2.5 flex items-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-1"></span>
-                    세제비적격 연금보험
-                  </h4>
-                  <div className="space-y-4">
-                    {/* 공시이율 */}
+                연금보험
+              </span>
+            </div>
+
+            <div className={`p-4 rounded-xl border relative overflow-hidden flex-1 flex flex-col justify-between ${
+              isDark ? "bg-[#F2AEBB]/5 border-[#F2AEBB]/30" : "bg-rose-50/20 border-rose-150"
+            }`}>
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-rose-400"></div>
+              <div className="space-y-4">
+                {/* 공시이율 */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold mb-0.5">
+                    <span className="text-slate-400">공시이율</span>
+                    <span className={`font-mono font-black ${isDark ? "text-rose-400" : "text-rose-500"}`}>{inputs.rateInsurance}%</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5 pt-1">
+                    {renderAdjustBtn(() => adj("rateInsurance", -0.1, 1.0, 6.0), false)}
+                    {renderSlider(inputs.rateInsurance, 1.0, 6.0, 0.1, (val) => onInputChange({ rateInsurance: val }), "#f43f5e")}
+                    {renderAdjustBtn(() => adj("rateInsurance", 0.1, 1.0, 6.0), true)}
+                  </div>
+                </div>
+
+                {/* 수령방법 */}
+                <div className="space-y-1">
+                  <label className="text-[9.5px] font-bold text-slate-400 block mb-1">수령 형태 선택</label>
+                  <div className={`grid grid-cols-2 gap-1 p-0.5 rounded-lg border ${isDark ? "bg-slate-900 border-slate-850" : "bg-white border-slate-200"}`}>
+                    <button
+                      type="button"
+                      onClick={() => onInputChange({ payoutMethod: "fixed" })}
+                      className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${
+                        inputs.payoutMethod === "fixed"
+                          ? "bg-rose-500 text-white shadow-xs"
+                          : "text-slate-450 hover:text-rose-400"
+                      }`}
+                    >
+                      확정형
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onInputChange({ payoutMethod: "lifetime" })}
+                      className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${
+                        inputs.payoutMethod === "lifetime"
+                          ? "bg-rose-500 text-white shadow-xs"
+                          : "text-slate-450 hover:text-rose-400"
+                      }`}
+                    >
+                      종신형
+                    </button>
+                  </div>
+                </div>
+
+                {inputs.payoutMethod === "fixed" ? (
+                  /* 수령기간 (fixed) */
+                  <div className={`space-y-4 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
                     <div className="space-y-1">
                       <div className="flex justify-between text-[10px] font-bold mb-0.5">
-                        <span className="text-slate-400">공시이율</span>
-                        <span className="font-mono text-rose-455 font-black">{inputs.rateInsurance}%</span>
+                        <span className="text-slate-400">수령 연한</span>
+                        <span className={`font-mono font-black ${isDark ? "text-rose-400" : "text-rose-500"}`}>{inputs.fixedTerm}년</span>
                       </div>
-                      <div className="flex items-center space-x-1.5 pt-1.5">
-                        {renderAdjustBtn(() => adj("rateInsurance", -0.1, 1.0, 6.0), false)}
-                        {renderSlider(inputs.rateInsurance, 1.0, 6.0, 0.1, (val) => onInputChange({ rateInsurance: val }), "#f43f5e")}
-                        {renderAdjustBtn(() => adj("rateInsurance", 0.1, 1.0, 6.0), true)}
-                      </div>
-                    </div>
-
-                    {/* 수령방법 */}
-                    <div className="space-y-1">
-                      <label className="text-[9.5px] font-bold text-slate-400 block mb-1">수령 형태 선택</label>
-                      <div className={`grid grid-cols-2 p-0.5 bg-slate-950/20 rounded-md border text-center ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                        <button type="button" onClick={() => onInputChange({ payoutMethod: "fixed" })} className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${inputs.payoutMethod === "fixed" ? "bg-rose-400 text-slate-950 font-black shadow-sm" : "text-slate-500 hover:text-rose-400"}`}>확정형</button>
-                        <button type="button" onClick={() => onInputChange({ payoutMethod: "lifetime" })} className={`py-1 text-[9.5px] font-bold rounded cursor-pointer transition-all ${inputs.payoutMethod === "lifetime" ? "bg-rose-400 text-slate-950 font-black shadow-sm" : "text-slate-500 hover:text-rose-400"}`}>종신형</button>
+                      <div className="flex items-center space-x-1.5 pt-1">
+                        {renderAdjustBtn(() => adj("fixedTerm", -5, 5, 20), false)}
+                        {renderSlider(inputs.fixedTerm, 5, 20, 5, (val) => onInputChange({ fixedTerm: val }), "#f43f5e")}
+                        {renderAdjustBtn(() => adj("fixedTerm", 5, 5, 20), true)}
                       </div>
                     </div>
-
-                    {inputs.payoutMethod === "fixed" ? (
-                      /* 수령기간 (fixed) */
-                      <div className={`space-y-4 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-[10px] font-bold mb-0.5">
-                            <span className="text-slate-400">수령 연한</span>
-                            <span className="font-mono text-rose-455 font-black">{inputs.fixedTerm}년</span>
-                          </div>
-                          <div className="flex items-center space-x-1.5 pt-1.5">
-                            {renderAdjustBtn(() => adj("fixedTerm", -5, 5, 20), false)}
-                            {renderSlider(inputs.fixedTerm, 5, 20, 5, (val) => onInputChange({ fixedTerm: val }), "#f43f5e")}
-                            {renderAdjustBtn(() => adj("fixedTerm", 5, 5, 20), true)}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      /* 종신형 선택시 표준 종신지급률, 유병자 효과, 최종 종신연금 비율 다 노출 */
-                      <div className={`space-y-4 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                        {/* 표준 종신지급률 */}
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-[10px] font-bold mb-0.5">
-                            <span className="text-slate-400">표준 종신지급률</span>
-                            <span className="font-mono text-rose-455 font-black">{inputs.insuranceAnnuityRate}%</span>
-                          </div>
-                          <div className="flex items-center space-x-1.5 pt-1.5">
-                            {renderAdjustBtn(() => adj("insuranceAnnuityRate", -0.1, 2.0, 7.0), false)}
-                            {renderSlider(inputs.insuranceAnnuityRate, 2.0, 7.0, 0.1, (val) => onInputChange({ insuranceAnnuityRate: val }), "#f43f5e")}
-                            {renderAdjustBtn(() => adj("insuranceAnnuityRate", 0.1, 2.0, 7.0), true)}
-                          </div>
-                        </div>
-
-                        {/* 유병자 효과 */}
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-[10px] font-bold mb-0.5">
-                            <span className="text-slate-400">유병자 효과</span>
-                            <span className="font-mono text-rose-455 font-black">{inputs.illHealthEffect}%</span>
-                          </div>
-                          <div className="flex items-center space-x-1.5 pt-1.5">
-                            {renderAdjustBtn(() => adj("illHealthEffect", -5, 100, 150), false)}
-                            {renderSlider(inputs.illHealthEffect, 100, 150, 5, (val) => onInputChange({ illHealthEffect: val }), "#f43f5e")}
-                            {renderAdjustBtn(() => adj("illHealthEffect", 5, 100, 150), true)}
-                          </div>
-                        </div>
-
-                        {/* 최종 종신연금 비율 */}
-                        <div className={`space-y-1 pt-1.5 border-t flex items-center justify-between ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                          <span className="text-[10px] text-slate-400 font-bold">최종 종신연금 비율</span>
-                          <span className="font-mono text-[10px] text-rose-455 font-black">
-                            {inputs.annuityPayoutRate.toFixed(2)}%
-                          </span>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </div>
-              </div>
-
-              {/* Product 3: 하이브리드 */}
-              <div className={`p-3.5 rounded-xl border relative overflow-hidden flex flex-col justify-between md:min-w-[225px] ${
-                isDark ? "bg-[#A7AAE1]/5 border-[#A7AAE1]/30" : "bg-purple-50/30 border-purple-150"
-              }`}>
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-[#A7AAE1]"></div>
-                <div>
-                  <h4 className="text-[11px] font-black text-[#A7AAE1] mb-2.5 flex items-center">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#A7AAE1] mr-1"></span>
-                    하이브리드
-                  </h4>
-                  <div className="space-y-4">
-                    {/* 적립기수익률/공시이율 가로 1x2 배열 */}
+                ) : (
+                  /* 종신형 선택시 표준 종신지급률, 유병자 효과 1x2 정렬 */
+                  <div className={`space-y-4 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                    
                     <div className="grid grid-cols-2 gap-2.5">
-                      {/* 적립기 수익률 (펀드와 싱크) */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-[10px] font-bold">
-                          <span className="text-slate-400">적립기수익률</span>
-                          <span className="font-mono text-[#A7AAE1] font-black">{inputs.ratePre.toFixed(1)}%</span>
-                        </div>
-                        <div className="flex items-center space-x-1.5 pt-1.5">
-                          {renderMiniAdjustBtn(() => adj("ratePre", -0.1, 2, 15), false, "hover:bg-[#A7AAE1] hover:border-[#A7AAE1] hover:text-slate-950")}
-                          {renderSlider(inputs.ratePre, 2, 15, 0.1, (val) => onInputChange({ ratePre: val }), "#A7AAE1")}
-                          {renderMiniAdjustBtn(() => adj("ratePre", 0.1, 2, 15), true, "hover:bg-[#A7AAE1] hover:border-[#A7AAE1] hover:text-slate-950")}
-                        </div>
-                      </div>
-
-                      {/* 공시이율 */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center text-[10px] font-bold">
-                          <span className="text-slate-400">공시이율</span>
-                          <span className="font-mono text-[#A7AAE1] font-black">{inputs.rateInsurance}%</span>
-                        </div>
-                        <div className="flex items-center space-x-1.5 pt-1.5">
-                          {renderMiniAdjustBtn(() => adj("rateInsurance", -0.1, 1.0, 6.0), false, "hover:bg-[#A7AAE1] hover:border-[#A7AAE1] hover:text-slate-950")}
-                          {renderSlider(inputs.rateInsurance, 1.0, 6.0, 0.1, (val) => onInputChange({ rateInsurance: val }), "#A7AAE1")}
-                          {renderMiniAdjustBtn(() => adj("rateInsurance", 0.1, 1.0, 6.0), true, "hover:bg-[#A7AAE1] hover:border-[#A7AAE1] hover:text-slate-950")}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 세제비적격 연금보험의 수령 형태 선택박스 높이를 맞추기 위한 투명 구조적 Spacer */}
-                    <div className="space-y-1 block select-none opacity-0 invisible pointer-events-none" aria-hidden="true">
-                      <label className="text-[9.5px] font-bold text-slate-400 block mb-1">수령 형태 선택</label>
-                      <div className={`grid grid-cols-2 p-0.5 bg-slate-950/20 rounded-md border text-center ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                        <span className="py-1 text-[9.5px] font-bold">확정형</span>
-                        <span className="py-1 text-[9.5px] font-bold">종신형</span>
-                      </div>
-                    </div>
-
-                    {/* 종신형 매칭 요소를 담는 리스트 및 선언부 */}
-                    <div className={`space-y-4 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
                       {/* 표준 종신지급률 */}
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold mb-0.5">
-                          <span className="text-slate-400">표준 종신지급률</span>
-                          <span className="font-mono text-[#A7AAE1] font-black">{inputs.insuranceAnnuityRate}%</span>
+                        <div className="flex justify-between text-[9px] font-bold mb-0.5">
+                          <span className="text-slate-400 truncate">표준 수령률</span>
+                          <span className={`font-mono text-[9.5px] font-black ${isDark ? "text-rose-400" : "text-rose-500"}`}>{inputs.insuranceAnnuityRate}%</span>
                         </div>
-                        <div className="flex items-center space-x-1.5 pt-1.5">
-                          {renderAdjustBtn(() => adj("insuranceAnnuityRate", -0.1, 2.0, 7.0), false)}
-                          {renderSlider(inputs.insuranceAnnuityRate, 2.0, 7.0, 0.1, (val) => onInputChange({ insuranceAnnuityRate: val }), "#A7AAE1")}
-                          {renderAdjustBtn(() => adj("insuranceAnnuityRate", 0.1, 2.0, 7.0), true)}
+                        <div className="flex items-center space-x-1 pt-1.5">
+                          {renderMiniAdjustBtn(() => adj("insuranceAnnuityRate", -0.1, 2.0, 7.0), false, "hover:bg-rose-500 hover:border-rose-500 hover:text-white")}
+                          {renderSlider(inputs.insuranceAnnuityRate, 2.0, 7.0, 0.1, (val) => onInputChange({ insuranceAnnuityRate: val }), "#f43f5e")}
+                          {renderMiniAdjustBtn(() => adj("insuranceAnnuityRate", 0.1, 2.0, 7.0), true, "hover:bg-rose-500 hover:border-rose-500 hover:text-white")}
                         </div>
                       </div>
 
                       {/* 유병자 효과 */}
                       <div className="space-y-1">
-                        <div className="flex justify-between text-[10px] font-bold mb-0.5">
-                          <span className="text-slate-400 font-sans">유병자 효과</span>
-                          <span className="font-mono text-[#A7AAE1] font-black">{inputs.illHealthEffect}%</span>
+                        <div className="flex justify-between text-[9px] font-bold mb-0.5">
+                          <span className="text-slate-400 truncate">유병자효율</span>
+                          <span className={`font-mono text-[9.5px] font-black ${isDark ? "text-rose-400" : "text-rose-500"}`}>{inputs.illHealthEffect}%</span>
                         </div>
-                        <div className="flex items-center space-x-1.5 pt-1.5">
-                          {renderAdjustBtn(() => adj("illHealthEffect", -5, 100, 150), false)}
-                          {renderSlider(inputs.illHealthEffect, 100, 150, 5, (val) => onInputChange({ illHealthEffect: val }), "#A7AAE1")}
-                          {renderAdjustBtn(() => adj("illHealthEffect", 5, 100, 150), true)}
+                        <div className="flex items-center space-x-1 pt-1.5">
+                          {renderMiniAdjustBtn(() => adj("illHealthEffect", -5, 100, 150), false, "hover:bg-rose-500 hover:border-rose-500 hover:text-white")}
+                          {renderSlider(inputs.illHealthEffect, 100, 150, 5, (val) => onInputChange({ illHealthEffect: val }), "#f43f5e")}
+                          {renderMiniAdjustBtn(() => adj("illHealthEffect", 5, 100, 150), true, "hover:bg-rose-500 hover:border-rose-500 hover:text-white")}
                         </div>
                       </div>
+                    </div>
 
-                      {/* 최종 종신연금 비율 */}
-                      <div className={`space-y-1 pt-1.5 border-t flex items-center justify-between ${isDark ? "border-slate-800" : "border-slate-200"}`}>
-                        <span className="text-[10px] text-slate-400 font-bold font-sans">최종 종신연금 비율</span>
-                        <span className="font-mono text-[10px] text-[#A7AAE1] font-black">
-                          {inputs.annuityPayoutRate.toFixed(2)}%
-                        </span>
-                      </div>
+                    {/* 최종 종신연금 비율 */}
+                    <div className={`space-y-1 pt-1.5 border-t flex items-center justify-between ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                      <span className="text-[10px] text-slate-400 font-bold">최종 종신연금 비율</span>
+                      <span className={`font-mono text-[10px] font-black ${isDark ? "text-rose-400" : "text-rose-600"}`}>
+                        {inputs.annuityPayoutRate.toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Column 4: 하이브리드 */}
+          <div className="flex flex-col">
+            <div className="flex items-center h-8 mb-2">
+              <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full inline-block ${
+                isDark ? "bg-purple-500/10 text-purple-400" : "bg-slate-100 text-slate-700"
+              }`}>
+                하이브리드
+              </span>
+            </div>
+
+            <div className={`p-4 rounded-xl border relative overflow-hidden flex-1 flex flex-col justify-between ${
+              isDark ? "bg-purple-950/20 border-purple-800/50" : "bg-purple-50/20 border-purple-150"
+            }`}>
+              <div className="absolute top-0 left-0 w-full h-[3px] bg-purple-500"></div>
+              <div className="space-y-4">
+                {/* 적립기수익률/공시이율 가로 1x2 배열 */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  {/* 적립기 수익률 (펀드와 싱크) */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold">
+                      <span className="text-slate-400">적립기수익률</span>
+                      <span className={`font-mono font-black ${isDark ? "text-purple-400" : "text-purple-600"}`}>{inputs.ratePre.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex items-center space-x-1 pt-1.5">
+                      {renderMiniAdjustBtn(() => adj("ratePre", -0.1, 2, 15), false, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                      {renderSlider(inputs.ratePre, 2, 15, 0.1, (val) => onInputChange({ ratePre: val }), isDark ? "#c084fc" : "#a855f7")}
+                      {renderMiniAdjustBtn(() => adj("ratePre", 0.1, 2, 15), true, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                    </div>
+                  </div>
+
+                  {/* 공시이율 */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold">
+                      <span className="text-slate-400">공시이율</span>
+                      <span className={`font-mono font-black ${isDark ? "text-purple-400" : "text-purple-600"}`}>{inputs.rateInsurance}%</span>
+                    </div>
+                    <div className="flex items-center space-x-1 pt-1.5">
+                      {renderMiniAdjustBtn(() => adj("rateInsurance", -0.1, 1.0, 6.0), false, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                      {renderSlider(inputs.rateInsurance, 1.0, 6.0, 0.1, (val) => onInputChange({ rateInsurance: val }), isDark ? "#c084fc" : "#a855f7")}
+                      {renderMiniAdjustBtn(() => adj("rateInsurance", 0.1, 1.0, 6.0), true, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
                     </div>
                   </div>
                 </div>
-              </div>
 
+                {/* 세제비적격 연금보험의 수령 형태 선택박스 높이를 맞추기 위한 투명 구조적 Spacer */}
+                <div className="space-y-1 block select-none opacity-0 invisible pointer-events-none" aria-hidden="true">
+                  <label className="text-[9.5px] font-bold text-slate-400 block mb-1">수령 형태 선택</label>
+                  <div className={`grid grid-cols-2 gap-1 p-0.5 rounded-lg border ${isDark ? "bg-slate-900 border-slate-850" : "bg-white border-slate-200"}`}>
+                    <span className="py-1 text-[9.5px] font-bold">확정형</span>
+                    <span className="py-1 text-[9.5px] font-bold">종신형</span>
+                  </div>
+                </div>
+
+                {/* 종신형 매칭 요소를 담는 리스트 및 선언부 1x2 레이아웃 적용 */}
+                <div className={`space-y-4 pt-1.5 border-t ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                  
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {/* 표준 종신지급률 */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[9px] font-bold mb-0.5">
+                        <span className="text-slate-400 truncate">표준 수령률</span>
+                        <span className={`font-mono text-[9.5px] font-black ${isDark ? "text-purple-400" : "text-purple-600"}`}>{inputs.insuranceAnnuityRate}%</span>
+                      </div>
+                      <div className="flex items-center space-x-1 pt-1.5">
+                        {renderMiniAdjustBtn(() => adj("insuranceAnnuityRate", -0.1, 2.0, 7.0), false, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                        {renderSlider(inputs.insuranceAnnuityRate, 2.0, 7.0, 0.1, (val) => onInputChange({ insuranceAnnuityRate: val }), isDark ? "#c084fc" : "#a855f7")}
+                        {renderMiniAdjustBtn(() => adj("insuranceAnnuityRate", 0.1, 2.0, 7.0), true, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                      </div>
+                    </div>
+
+                    {/* 유병자 효과 */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[9px] font-bold mb-0.5">
+                        <span className="text-slate-400 truncate">유병자효율</span>
+                        <span className={`font-mono text-[9.5px] font-black ${isDark ? "text-purple-400" : "text-purple-600"}`}>{inputs.illHealthEffect}%</span>
+                      </div>
+                      <div className="flex items-center space-x-1 pt-1.5">
+                        {renderMiniAdjustBtn(() => adj("illHealthEffect", -5, 100, 150), false, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                        {renderSlider(inputs.illHealthEffect, 100, 150, 5, (val) => onInputChange({ illHealthEffect: val }), isDark ? "#c084fc" : "#a855f7")}
+                        {renderMiniAdjustBtn(() => adj("illHealthEffect", 5, 100, 150), true, "hover:bg-purple-500 hover:border-purple-500 hover:text-white")}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 최종 종신연금 비율 */}
+                  <div className={`space-y-1 pt-1.5 border-t flex items-center justify-between ${isDark ? "border-slate-800" : "border-slate-200"}`}>
+                    <span className="text-[10px] text-slate-400 font-bold">최종 종신연금 비율</span>
+                    <span className={`font-mono text-[10px] font-black ${isDark ? "text-purple-400" : "text-purple-600"}`}>
+                      {inputs.annuityPayoutRate.toFixed(2)}%
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -841,11 +858,13 @@ export default function ComparisonPanel({
             ? "bg-gradient-to-b from-slate-900/90 to-slate-950 border-slate-800/80 hover:border-purple-300/30" 
             : "bg-white border-slate-205 shadow-sm hover:shadow-md"
         }`}>
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-[#A7AAE1]"></div>
+          <div className={`absolute top-0 left-0 w-full h-1.5 ${isDark ? "bg-[#A7AAE1]" : "bg-purple-600"}`}></div>
           <div>
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <span className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded border border-[#A7AAE1]/20 text-[#A7AAE1] tracking-wider bg-[#A7AAE1]/5`}>
+              <span className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded border border-[#A7AAE1]/20 ${
+                isDark ? "text-[#A7AAE1] bg-[#A7AAE1]/5" : "text-purple-700 border-purple-200 bg-purple-50"
+              } tracking-wider`}>
                 가장 추천하는 혼합형
               </span>
               <span className="text-[10px] font-bold text-slate-500">하이브리드 연금전환</span>
@@ -866,7 +885,7 @@ export default function ComparisonPanel({
                 <span className="text-[10px] text-slate-400 font-bold block mb-1">
                   💡 개시 시점 예상 적립금
                 </span>
-                <span className="text-xl font-black text-[#A7AAE1] block tracking-tight font-mono">
+                <span className={`text-xl font-black block tracking-tight font-mono ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>
                   {yLabel(hybridResult.retirementBalance)}
                 </span>
               </div>
@@ -879,7 +898,7 @@ export default function ComparisonPanel({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-450">세액공제 재투자액</span>
-                  <span className="font-mono font-bold text-[#A7AAE1]">
+                  <span className={`font-mono font-bold ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>
                     {inputs.reinvestTaxCredit ? yLabel(hybridResult.cumulativeRefundTotal) : "전략 OFF [0원]"}
                   </span>
                 </div>
@@ -891,7 +910,7 @@ export default function ComparisonPanel({
                 </div>
                 <div className="flex justify-between border-t pt-1 border-slate-850">
                   <span className="text-slate-450">누적 세환급 총액 (연말정산)</span>
-                  <span className="font-mono font-bold">{yLabel(hybridResult.cumulativeRefundTotal)}</span>
+                  <span className={`font-mono font-bold ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>{yLabel(hybridResult.cumulativeRefundTotal)}</span>
                 </div>
               </div>
             </div>
@@ -900,7 +919,7 @@ export default function ComparisonPanel({
 
             {/* Section 2: 연금연액 및 수령 조건 */}
             <div className="space-y-3 mb-6">
-              <h5 className="text-[11px] font-black text-[#A7AAE1] uppercase tracking-wider mb-2">
+              <h5 className={`text-[11px] font-black uppercase tracking-wider mb-2 ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>
                 💵 인출 연금연액 &amp; 연한
               </h5>
               
@@ -908,17 +927,17 @@ export default function ComparisonPanel({
                 <div className="grid grid-cols-2 gap-2 text-left">
                   <div className={`p-2.5 rounded-lg border ${isDark ? "bg-slate-950/40 border-slate-850" : "bg-slate-50 border-slate-200"}`}>
                     <span className="text-[9.5px] text-slate-450 block">인출 대상액 (세전)</span>
-                    <strong className="text-[13px] tracking-tight">{yLabel(hybridResult.preTaxWithdrawal)}</strong>
+                    <strong className={`text-[13px] tracking-tight ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>{yLabel(hybridResult.preTaxWithdrawal)}</strong>
                   </div>
-                  <div className={`p-2.5 rounded-lg border ${isDark ? "bg-slate-950/40 border-slate-850" : "bg-purple-950/20 border-purple-300/40"}`}>
-                    <span className="text-[9.5px] text-[#A7AAE1] font-bold block">보장 연 실수령 (세후)</span>
-                    <strong className="text-[13px] text-[#A7AAE1] tracking-tight">{yLabel(hybridResult.afterTaxWithdrawal)}</strong>
+                  <div className={`p-2.5 rounded-lg border ${isDark ? "bg-slate-950/40 border-slate-850" : "bg-purple-50 border-purple-200"}`}>
+                    <span className={`text-[9.5px] font-bold block ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>보장 연 실수령 (세후)</span>
+                    <strong className={`text-[13px] tracking-tight ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>{yLabel(hybridResult.afterTaxWithdrawal)}</strong>
                   </div>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-slate-450">월 수령환산 평준액</span>
-                  <span className="font-bold text-[#A7AAE1] font-mono">{(hybridResult.afterTaxWithdrawal / 12).toFixed(1)}만원/월</span>
+                  <span className={`font-bold font-mono ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>{(hybridResult.afterTaxWithdrawal / 12).toFixed(1)}만원/월</span>
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -934,13 +953,13 @@ export default function ComparisonPanel({
 
             {/* Section 3: 세금 혜택 */}
             <div className="space-y-2.5 text-xs">
-              <h5 className="text-[11px] font-black text-[#A7AAE1] uppercase tracking-wider mb-2">
+              <h5 className={`text-[11px] font-black uppercase tracking-wider mb-2 ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>
                 🛡️ 절세 구조 및 세제 혜택
               </h5>
 
               <div className="flex justify-between">
                 <span className="text-slate-450">납입 시 세금혜택</span>
-                <span className="font-semibold text-[#A7AAE1]">연 최대 148.5만원 환급</span>
+                <span className={`font-semibold ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>연 최대 148.5만원 환급</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-450">종신 연소득세 특약</span>
@@ -948,7 +967,7 @@ export default function ComparisonPanel({
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-450">연 세금차감 평준액</span>
-                <span className="font-mono font-bold text-rose-455">
+                <span className={`font-mono font-bold ${isDark ? "text-[#A7AAE1]" : "text-purple-600"}`}>
                   {yLabel(Math.max(0, hybridResult.preTaxWithdrawal - hybridResult.afterTaxWithdrawal))}
                 </span>
               </div>
