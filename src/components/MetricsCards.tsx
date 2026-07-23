@@ -183,7 +183,7 @@ export default function MetricsCards({
             <div className={`text-xs font-black font-mono ${isDark ? "text-slate-200" : "text-slate-800"}`}>
               {accumulationYears}년 적립
             </div>
-            <p className="text-[9px] text-slate-400 mt-1 leading-none">{inputs.startAge}세 ~ {inputs.endAge}세</p>
+            <p className="text-[9px] text-slate-400 mt-1 leading-none">{inputs.startAge}세 ~ {inputs.endAge}세 (납입: {inputs.depositYears}년)</p>
           </div>
 
           <div className={`p-3 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800/40" : "bg-white border-slate-200"}`}>
@@ -317,7 +317,7 @@ export default function MetricsCards({
                       </div>
                     </div>
                     <div className={`flex justify-between text-[10px] font-semibold mt-2 border-t pt-1.5 ${
-                      isDark ? "border-slate-800/80 text-slate-500" : "border-slate-250 text-slate-400"
+                      isDark ? "border-slate-800/80 text-slate-500" : "border-slate-200 text-slate-400"
                     }`}>
                       <span>연금소득세액</span>
                       <span className="text-red-400 font-mono">-{yLabel(baseTax)}</span>
@@ -345,7 +345,7 @@ export default function MetricsCards({
                       </div>
                     </div>
                     <div className={`flex justify-between text-[10px] font-semibold mt-2 border-t pt-1.5 ${
-                      isDark ? "border-slate-800/80 text-slate-500" : "border-slate-250 text-slate-400"
+                      isDark ? "border-slate-800/80 text-slate-500" : "border-slate-200 text-slate-400"
                     }`}>
                       <span>분리과세액 (16.5%)</span>
                       <span className={`${isOver1500 ? "text-red-400 font-mono" : "text-slate-500"}`}>

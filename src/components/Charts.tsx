@@ -314,7 +314,7 @@ export default function Charts({ chart1Data, chart2Data, startAge, endAge, theme
           <div className={`h-[280px] flex flex-col items-center justify-center text-center p-4 rounded-xl border border-dashed ${
             isDark 
               ? "bg-slate-950/20 border-slate-800 text-slate-500" 
-              : "bg-slate-50 border-slate-250 text-slate-500"
+              : "bg-slate-50 border-slate-200 text-slate-500"
           }`}>
             <span className="text-xs font-black">적립 중에는 인출기 현금 흐름 자료가 존재하지 않습니다.</span>
             <p className="text-[10px] text-slate-400 mt-1">시작 나이가 개시 나이보다 더 작을 때 활성화됩니다.</p>

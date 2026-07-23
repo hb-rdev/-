@@ -49,6 +49,9 @@ export interface SimulationResult {
     isAccumulation: boolean;
   }[];
   retirementBalance: number; // 개시 시점 잔액
+  retirementPrincipal: number; // 개시 시점 원금
+  retirementReinvested: number; // 개시 시점 재투자금
+  retirementGains: number; // 개시 시점 투자 수익
   depleteAge: number | null; // 소진 예상 나이 (null 이면 없음)
   firstYearGainVsWithdraw: number; // 연 수익 vs 인출 (개시 첫해 수익 - 세전 인출액)
   accumulationYears: number; // 적립 기간

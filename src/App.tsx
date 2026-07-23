@@ -18,8 +18,44 @@ import {
   HelpCircle,
   PiggyBank,
   ShieldCheck,
-  Scale
+  Scale,
+  Save,
+  Trash2,
+  Database,
+  Plus
 } from "lucide-react";
+
+interface SavedCase {
+  id: string;
+  name: string;
+  inputs: SimulationInputs;
+  isDefault?: boolean;
+}
+
+const DEFAULT_CASES: SavedCase[] = [
+  {
+    id: "case-default-1",
+    name: "기본 조건 (월 50만 / 30세 / 8.0%)",
+    inputs: {
+      monthlyDeposit: 50,
+      startAge: 30,
+      endAge: 55,
+      depositYears: 25,
+      ratePre: 8.0,
+      ratePost: 5.0,
+      annualWithdrawal: 1500,
+      reinvestTaxCredit: true,
+      taxCreditRate: 13.2,
+      simulationType: "fund",
+      rateInsurance: 2.5,
+      payoutMethod: "lifetime",
+      fixedTerm: 10,
+      annuityPayoutRate: 3.7,
+      insuranceAnnuityRate: 3.7,
+      illHealthEffect: 100,
+    }
+  }
+];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>("compare");
@@ -28,22 +64,109 @@ export default function App() {
   // State initialized with precise financial default values
   const [inputs, setInputs] = useState<SimulationInputs>({
     monthlyDeposit: 50,      // 만원
-    startAge: 25,          // 세 (user request: 25세)
-    endAge: 60,            // 세 (user request: 60세)
-    depositYears: 35,      // 년 (60 - 25 = 35년)
-    ratePre: 8.0,          // % (user request: 8% 적립기수익률)
+    startAge: 30,          // 세
+    endAge: 55,            // 세
+    depositYears: 25,      // 년
+    ratePre: 8.0,         // %
     ratePost: 5.0,         // %
     annualWithdrawal: 1500, // 만원
     reinvestTaxCredit: true,
     taxCreditRate: 13.2,
     simulationType: "fund",
     rateInsurance: 2.5,
-    payoutMethod: "fixed",
+    payoutMethod: "lifetime",
     fixedTerm: 10,
-    annuityPayoutRate: 4.4, // Calculated initially from 4.0 * (110 / 100) = 4.4
-    insuranceAnnuityRate: 4.0,
-    illHealthEffect: 110,
+    annuityPayoutRate: 3.7,
+    insuranceAnnuityRate: 3.7,
+    illHealthEffect: 100,
   });
+
+  const [savedCases, setSavedCases] = useState<SavedCase[]>(() => {
+    try {
+      const stored = localStorage.getItem("saved_simulation_cases");
+      if (stored) {
+        let parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Upgrade or replace the default case to the new requested defaults
+          parsed = parsed.map((c) => {
+            if (c.id === "case-default-1") {
+              return DEFAULT_CASES[0];
+            }
+            return c;
+          });
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return DEFAULT_CASES;
+  });
+
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>("case-default-1");
+  const [newCaseName, setNewCaseName] = useState("");
+
+  const handleSaveCase = (e: React.FormEvent) => {
+    e.preventDefault();
+    const nameToUse = newCaseName.trim()
+      ? newCaseName.trim()
+      : `월 ${inputs.monthlyDeposit}만 / ${inputs.startAge}세 / ${inputs.ratePre.toFixed(1)}%`;
+
+    const newCase: SavedCase = {
+      id: `case-${Date.now()}`,
+      name: nameToUse,
+      inputs: { ...inputs },
+    };
+
+    const updated = [...savedCases, newCase];
+    setSavedCases(updated);
+    setSelectedCaseId(newCase.id);
+    setNewCaseName("");
+    try {
+      localStorage.setItem("saved_simulation_cases", JSON.stringify(updated));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteCase = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const updated = savedCases.filter((c) => c.id !== id);
+    setSavedCases(updated);
+    if (selectedCaseId === id) {
+      if (updated.length > 0) {
+        setSelectedCaseId(updated[0].id);
+        setInputs({ ...updated[0].inputs });
+      } else {
+        setSelectedCaseId(null);
+      }
+    }
+    try {
+      localStorage.setItem("saved_simulation_cases", JSON.stringify(updated));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const isSameInputs = (a: SimulationInputs, b: SimulationInputs) => {
+    return (
+      a.monthlyDeposit === b.monthlyDeposit &&
+      a.startAge === b.startAge &&
+      a.endAge === b.endAge &&
+      a.depositYears === b.depositYears &&
+      a.ratePre === b.ratePre &&
+      a.ratePost === b.ratePost &&
+      a.annualWithdrawal === b.annualWithdrawal &&
+      a.reinvestTaxCredit === b.reinvestTaxCredit &&
+      a.taxCreditRate === b.taxCreditRate &&
+      a.simulationType === b.simulationType &&
+      a.rateInsurance === b.rateInsurance &&
+      a.payoutMethod === b.payoutMethod &&
+      a.fixedTerm === b.fixedTerm &&
+      a.insuranceAnnuityRate === b.insuranceAnnuityRate &&
+      a.illHealthEffect === b.illHealthEffect
+    );
+  };
 
   const handleInputChange = (newInputs: Partial<SimulationInputs>) => {
     setInputs((prev) => {
@@ -55,11 +178,6 @@ export default function App() {
       }
 
       const maxDepositYears = Math.max(1, merged.endAge - merged.startAge);
-      if (newInputs.startAge !== undefined || newInputs.endAge !== undefined) {
-        if (newInputs.depositYears === undefined) {
-          merged.depositYears = maxDepositYears;
-        }
-      }
       if (merged.depositYears > maxDepositYears) {
         merged.depositYears = maxDepositYears;
       }
@@ -79,21 +197,21 @@ export default function App() {
   const handleReset = () => {
     setInputs({
       monthlyDeposit: 50,
-      startAge: 35,
+      startAge: 30,
       endAge: 55,
-      depositYears: 20,
-      ratePre: 7.0,
+      depositYears: 25,
+      ratePre: 8.0,
       ratePost: 5.0,
       annualWithdrawal: 1500,
       reinvestTaxCredit: true,
       taxCreditRate: 13.2,
       simulationType: "fund",
       rateInsurance: 2.5,
-      payoutMethod: "fixed",
+      payoutMethod: "lifetime",
       fixedTerm: 10,
-      annuityPayoutRate: 4.4,
-      insuranceAnnuityRate: 4.0,
-      illHealthEffect: 110,
+      annuityPayoutRate: 3.7,
+      insuranceAnnuityRate: 3.7,
+      illHealthEffect: 100,
     });
   };
 
@@ -104,14 +222,25 @@ export default function App() {
 
   // Map timeline data into plotting structures for Recharts
   const chart1Data = useMemo(() => {
-    return result.timeline.map((p) => ({
-      age: p.age,
-      principal: p.principal,
-      reinvested: p.reinvested,
-      gains: p.gains,
-      total: p.balance,
-    }));
-  }, [result.timeline]);
+    return result.timeline.map((p) => {
+      if (p.age === inputs.endAge) {
+        return {
+          age: p.age,
+          principal: result.retirementPrincipal,
+          reinvested: result.retirementReinvested,
+          gains: result.retirementGains,
+          total: result.retirementBalance,
+        };
+      }
+      return {
+        age: p.age,
+        principal: p.principal,
+        reinvested: p.reinvested,
+        gains: p.gains,
+        total: p.balance,
+      };
+    });
+  }, [result, inputs.endAge]);
 
   const chart2Data = useMemo(() => {
     return result.timeline
@@ -187,6 +316,115 @@ export default function App() {
 
         {/* Dynamic Inner Tab View */}
         <div className="p-4 md:p-5 flex-1 min-h-0">
+          {/* Simulation Cases Manager Widget */}
+          <div className={`p-4 rounded-2xl border mb-6 transition-all duration-300 shadow-xs ${
+            isDark 
+              ? "bg-slate-900/60 border-slate-800" 
+              : "bg-white border-slate-200"
+          }`}>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-3 pb-3 border-b border-dashed border-slate-200 dark:border-slate-800">
+              <div className="flex items-center space-x-2">
+                <Database className={`w-4 h-4 ${isDark ? "text-indigo-400" : "text-indigo-650"}`} />
+                <span className="text-xs font-black tracking-tight">시뮬레이션 케이스 데이터베이스</span>
+                <span className="text-[10px] text-slate-450 font-medium">(조건을 수정하고 저장해 보세요)</span>
+              </div>
+
+              {/* Inline Save & Update Form */}
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="케이스 이름 입력/수정..."
+                  value={newCaseName}
+                  onChange={(e) => setNewCaseName(e.target.value)}
+                  className={`px-3 py-1 text-xs rounded-lg border focus:outline-none focus:ring-1 transition-all w-48 ${
+                    isDark 
+                      ? "bg-slate-955 border-slate-800 text-slate-250 focus:border-[#355c7d] focus:ring-[#355c7d]" 
+                      : "bg-slate-50 border-slate-200 text-slate-800 focus:border-[#355c7d] focus:ring-[#355c7d]"
+                  }`}
+                />
+                
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    handleSaveCase(e as any);
+                  }}
+                  className="px-3 py-1 bg-[#355c7d] hover:bg-[#2c4c68] text-white text-[11px] font-black rounded-lg inline-flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-2xs"
+                  title="현재 설정값으로 새로운 케이스를 저장합니다."
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  새 케이스로 저장
+                </button>
+
+                {selectedCaseId && savedCases.some(c => c.id === selectedCaseId) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = savedCases.map((c) => {
+                        if (c.id === selectedCaseId) {
+                          return {
+                            ...c,
+                            name: newCaseName.trim() ? newCaseName.trim() : c.name,
+                            inputs: { ...inputs },
+                          };
+                        }
+                        return c;
+                      });
+                      setSavedCases(updated);
+                      setNewCaseName("");
+                      try {
+                        localStorage.setItem("saved_simulation_cases", JSON.stringify(updated));
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                    className="px-3 py-1 bg-[#6C5B7B] hover:bg-[#5b4c6a] text-white text-[11px] font-black rounded-lg inline-flex items-center gap-1 cursor-pointer transition-all active:scale-95 shadow-2xs"
+                    title="현재 수치로 선택된 슬롯를 업데이트합니다. 입력창에 텍스트가 있으면 이름도 변경됩니다."
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    선택 케이스 덮어쓰기 (수정)
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Cases list */}
+            <div className="flex flex-wrap gap-2">
+              {savedCases.map((savedCase) => {
+                const isActive = selectedCaseId === savedCase.id;
+                return (
+                  <div
+                    key={savedCase.id}
+                    onClick={() => {
+                      setInputs({ ...savedCase.inputs });
+                      setSelectedCaseId(savedCase.id);
+                    }}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center justify-between gap-2.5 cursor-pointer transition-all ${
+                      isActive
+                        ? "bg-[#355c7d] border-[#2c4c68] text-white shadow-3xs hover:bg-[#2c4c68] hover:scale-[1.02]"
+                        : isDark
+                          ? "bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+                          : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 shadow-3xs"
+                    }`}
+                  >
+                    <span className="truncate max-w-[280px]">{savedCase.name}</span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleDeleteCase(savedCase.id, e)}
+                      className={`p-0.5 rounded-md transition-colors ${
+                        isActive
+                          ? "text-slate-200 hover:text-white hover:bg-white/10"
+                          : "text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                      }`}
+                      title="케이스 삭제"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {activeTab === "compare" && (
             <ComparisonPanel
               inputs={inputs}

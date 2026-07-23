@@ -81,7 +81,7 @@ export default function InputPanel({
       case "insuranceAnnuityRate":
         return "연금 개시 시점 기준, 보험사에서 산정해 제공하는 표준 종신 연금지급률입니다. 범위: 2.0% ~ 7.0% (0.1% 단위)";
       case "illHealthEffect":
-        return "건강 상태가 좋지 않은 피보험자의 기대수명 단축을 감안하여 일시금 지급액 비율을 높여주는 유병자 효과 비율입니다. 범위: 0% ~ 100% (5% 단위)";
+        return "건강 상태가 좋지 않은 피보험자의 기대수명 단축을 감안하여 일시금 지급액 비율을 높여주는 유병자 효과 비율입니다. 범위: 100% ~ 200% (5% 단위)";
       case "annualWithdrawal":
         return "연금저축펀드 수령기 동안 매년 본인의 은퇴 생활비 등으로 인출할 계획인 세전 희망액입니다.";
       case "depositYears":
@@ -92,149 +92,144 @@ export default function InputPanel({
   };
 
   const getCardDetails = (id: string) => {
+    const activeColor = inputs.simulationType === "hybrid" 
+      ? "#6C5B7B" 
+      : inputs.simulationType === "nonTaxable" 
+        ? "#f67280" 
+        : "#355c7d";
+
     switch (id) {
       case "monthlyDeposit":
         return {
           title: "월 납입액",
-          icon: <Coins className="w-3.5 h-3.5 text-indigo-400" />,
+          icon: <Coins className="w-3.5 h-3.5" />,
           min: 10,
           max: 200,
           step: 5,
           unit: "만원",
           key: "monthlyDeposit" as keyof SimulationInputs,
-          colorClass: "text-[#6366f1]",
-          bgColorClass: "bg-indigo-500/10",
+          color: activeColor,
           stepDelta: 5,
         };
       case "startAge":
         return {
           title: "시작 나이",
-          icon: <User className="w-3.5 h-3.5 text-indigo-400" />,
+          icon: <User className="w-3.5 h-3.5" />,
           min: 25,
           max: 50,
           step: 1,
           unit: "세",
           key: "startAge" as keyof SimulationInputs,
-          colorClass: "text-[#6366f1]",
-          bgColorClass: "bg-indigo-500/10",
+          color: activeColor,
           stepDelta: 1,
         };
       case "endAge":
         return {
           title: "개시 나이",
-          icon: <Hourglass className="w-3.5 h-3.5 text-indigo-400" />,
+          icon: <Hourglass className="w-3.5 h-3.5" />,
           min: 55,
           max: 70,
           step: 1,
           unit: "세",
           key: "endAge" as keyof SimulationInputs,
-          colorClass: "text-[#6366f1]",
-          bgColorClass: "bg-indigo-500/10",
+          color: activeColor,
           stepDelta: 1,
         };
       case "depositYears":
         return {
           title: "납입 기간",
-          icon: <Hourglass className="w-3.5 h-3.5 text-indigo-400" />,
+          icon: <Hourglass className="w-3.5 h-3.5" />,
           min: 1,
           max: Math.max(1, inputs.endAge - inputs.startAge),
           step: 1,
           unit: "년",
           key: "depositYears" as keyof SimulationInputs,
-          colorClass: "text-[#6366f1]",
-          bgColorClass: "bg-indigo-500/10",
+          color: activeColor,
           stepDelta: 1,
         };
       case "ratePre":
         return {
           title: "적립기 수익률",
-          icon: <TrendingUp className="w-3.5 h-3.5 text-indigo-400" />,
+          icon: <TrendingUp className="w-3.5 h-3.5" />,
           min: 2,
           max: 15,
           step: 0.1,
           unit: "%",
           key: "ratePre" as keyof SimulationInputs,
-          colorClass: "text-[#6366f1]",
-          bgColorClass: "bg-indigo-500/10",
+          color: activeColor,
           stepDelta: 0.1,
         };
       case "ratePost":
         return {
           title: "인출기 수익률",
-          icon: <TrendingDown className="w-3.5 h-3.5 text-indigo-400" />,
+          icon: <TrendingDown className="w-3.5 h-3.5" />,
           min: 1,
           max: 15,
           step: 0.1,
           unit: "%",
           key: "ratePost" as keyof SimulationInputs,
-          colorClass: "text-[#64748b]",
-          bgColorClass: "bg-slate-500/10",
+          color: activeColor,
           stepDelta: 0.1,
         };
       case "rateInsurance":
         return {
           title: "공시이율",
-          icon: <TrendingUp className="w-3.5 h-3.5 text-[#A7AAE1]" />,
+          icon: <TrendingUp className="w-3.5 h-3.5" />,
           min: 1.0,
           max: 6.0,
           step: 0.1,
           unit: "%",
           key: "rateInsurance" as keyof SimulationInputs,
-          colorClass: "text-[#A7AAE1]",
-          bgColorClass: "bg-[#A7AAE1]/10",
+          color: activeColor,
           stepDelta: 0.1,
         };
       case "fixedTerm":
         return {
           title: "확정 수령기간",
-          icon: <Hourglass className="w-3.5 h-3.5 text-[#F2AEBB]" />,
+          icon: <Hourglass className="w-3.5 h-3.5" />,
           min: 5,
           max: 20,
           step: 5,
           unit: "년",
           key: "fixedTerm" as keyof SimulationInputs,
-          colorClass: "text-[#F2AEBB]",
-          bgColorClass: "bg-[#F2AEBB]/10",
+          color: activeColor,
           stepDelta: 5,
         };
       case "insuranceAnnuityRate":
         return {
           title: "표준 종신지급률",
-          icon: <DollarSign className="w-3.5 h-3.5 text-[#A7AAE1]" />,
+          icon: <DollarSign className="w-3.5 h-3.5" />,
           min: 2.0,
           max: 7.0,
           step: 0.1,
           unit: "%",
           key: "insuranceAnnuityRate" as keyof SimulationInputs,
-          colorClass: "text-[#A7AAE1]",
-          bgColorClass: "bg-[#A7AAE1]/10",
+          color: activeColor,
           stepDelta: 0.1,
         };
       case "illHealthEffect":
         return {
           title: "유병자 효과",
-          icon: <Percent className="w-3.5 h-3.5 text-[#A7AAE1]" />,
+          icon: <Percent className="w-3.5 h-3.5" />,
           min: 100,
-          max: 150,
+          max: 200,
           step: 5,
           unit: "%",
           key: "illHealthEffect" as keyof SimulationInputs,
-          colorClass: "text-[#A7AAE1]",
-          bgColorClass: "bg-[#A7AAE1]/10",
+          color: activeColor,
           stepDelta: 5,
         };
       case "annualWithdrawal":
       default:
         return {
           title: "희망 연 수령액",
-          icon: <DollarSign className="w-3.5 h-3.5 text-[#F2AEBB]" />,
+          icon: <DollarSign className="w-3.5 h-3.5" />,
           min: 500,
           max: 6000,
           step: 100,
           unit: "만원",
           key: "annualWithdrawal" as keyof SimulationInputs,
-          colorClass: "text-[#F2AEBB]",
-          bgColorClass: "bg-[#F2AEBB]/10",
+          color: activeColor,
           stepDelta: 100,
         };
     }
@@ -322,6 +317,11 @@ export default function InputPanel({
 
   const isDark = theme === "dark";
   const isNonTaxable = inputs.simulationType === "nonTaxable";
+  const activeColor = inputs.simulationType === "hybrid" 
+    ? "#6C5B7B" 
+    : inputs.simulationType === "nonTaxable" 
+      ? "#f67280" 
+      : "#355c7d";
 
   return (
     <div className={`p-4 rounded-2xl border transition-all duration-300 shadow-lg ${
@@ -333,12 +333,17 @@ export default function InputPanel({
       <div className="flex items-center justify-between border-b pb-2.5 mb-4 border-dashed transition-colors duration-300 gap-2 overflow-hidden select-none"
            style={{ borderColor: isDark ? "rgba(71, 85, 105, 0.4)" : "rgba(226, 232, 240, 1)" }}>
         <div className="flex items-center space-x-2">
-          <FlameKindling className={`w-4 h-4 animate-pulse ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+          <FlameKindling className="w-4 h-4 animate-pulse" style={{ color: isDark ? "rgba(226, 232, 240, 0.8)" : activeColor }} />
           <span className={`text-xs font-black tracking-tight ${isDark ? "text-slate-100" : "text-slate-800"}`}>
             시뮬레이션 인풋 설정
           </span>
         </div>
-        <p className={`text-[9px] font-mono tracking-wider font-semibold px-1.5 py-0.5 rounded border border-indigo-500/20 text-indigo-400 bg-indigo-500/5`}>
+        <p className="text-[9px] font-mono tracking-wider font-semibold px-1.5 py-0.5 rounded border"
+           style={{
+             borderColor: `${activeColor}25`,
+             color: activeColor,
+             backgroundColor: `${activeColor}08`
+           }}>
           Interactive Controller
         </p>
       </div>
@@ -359,7 +364,7 @@ export default function InputPanel({
             onClick={() => onInputChange({ simulationType: "fund" })}
             className={`py-2 px-1.5 rounded-lg text-[10.5px] font-black tracking-tight text-center transition-all cursor-pointer focus:outline-none flex flex-col items-center justify-center min-h-[46px] ${
               inputs.simulationType === "fund"
-                ? "bg-[#696FC7] text-white shadow-md"
+                ? "bg-[#355c7d] text-white shadow-md font-black"
                 : isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -371,7 +376,7 @@ export default function InputPanel({
             onClick={() => onInputChange({ simulationType: "nonTaxable" })}
             className={`py-2 px-1.5 rounded-lg text-[10.5px] font-black tracking-tight text-center transition-all cursor-pointer focus:outline-none flex flex-col items-center justify-center min-h-[46px] ${
               inputs.simulationType === "nonTaxable"
-                ? "bg-[#F2AEBB] text-slate-950 shadow-md font-black"
+                ? "bg-[#f67280] text-white shadow-md font-black"
                 : isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -383,7 +388,7 @@ export default function InputPanel({
             onClick={() => onInputChange({ simulationType: "hybrid" })}
             className={`py-2 px-1.5 rounded-lg text-[10.5px] font-black tracking-tight text-center transition-all cursor-pointer focus:outline-none flex flex-col items-center justify-center min-h-[46px] ${
               inputs.simulationType === "hybrid"
-                ? "bg-[#A7AAE1] text-slate-950 shadow-md font-black"
+                ? "bg-[#6C5B7B] text-white shadow-md font-black"
                 : isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -401,15 +406,15 @@ export default function InputPanel({
           2) 공통 가입 조건 &amp; 세액공제 재투자 전략
         </label>
         
-        {/* 공통 가입조건 카드 (2x2 Compact Grid) */}
+        {/* 공통 가입조건 카드 (1x2 및 1x1 혼합 레이아웃) */}
         <div className={`p-3 rounded-2xl border mb-3.5 select-none ${
           isDark 
             ? "bg-slate-950/45 border-slate-800/90" 
-            : "bg-slate-50/50 border-slate-205/90 shadow-2xs"
+            : "bg-slate-50/50 border-slate-200/90 shadow-2xs"
         }`}>
           <div className="flex items-center justify-between mb-2.5">
             <div className="flex items-center space-x-1.5">
-              <span className={`text-[10px] font-black uppercase tracking-wider ${isDark ? "text-[#A7AAE1]" : "text-[#696FC7]"}`}>
+              <span className={`text-[10px] font-black uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                 📋 공통 가입 조건
               </span>
               {inputs.depositYears < (inputs.endAge - inputs.startAge) && (
@@ -420,29 +425,27 @@ export default function InputPanel({
                 </span>
               )}
             </div>
-            <span className={`text-[9px] font-semibold text-slate-500`}>
-              {inputs.startAge}세 ~ {inputs.endAge}세 (적립 {inputs.endAge - inputs.startAge}년)
+            <span className={`text-[9.5px] font-bold ${isDark ? "text-slate-400" : "text-[#355c7d]"} text-right`}>
+              {inputs.startAge}세 ~ {inputs.endAge}세 (납입 {inputs.depositYears}년 / 적립 {inputs.endAge - inputs.startAge}년)
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            {commonCardIds.map((cardId) => {
+          <div className="space-y-2">
+            {/* 월 납입액 (Full Row Card) */}
+            {(() => {
+              const cardId = "monthlyDeposit";
               const detail = getCardDetails(cardId);
               const val = inputs[detail.key] as number;
               const tooltipActive = activeTooltip === cardId;
-
               return (
-                <div
-                  key={cardId}
-                  className={`flex flex-col justify-between p-2 rounded-xl border transition-all duration-300 relative select-none ${
-                    isDark 
-                      ? "bg-slate-900/40 border-slate-800/80 hover:border-slate-700/60" 
-                      : "bg-white border-slate-200 hover:bg-white hover:border-indigo-150 hover:shadow-2xs"
-                  }`}
-                >
+                <div className={`flex flex-col justify-between p-2 rounded-xl border transition-all duration-300 relative select-none ${
+                  isDark 
+                    ? "bg-slate-900/40 border-slate-800/80 hover:border-slate-700/60" 
+                    : "bg-white border-slate-200 hover:bg-white hover:border-[#355c7d]/40 hover:shadow-2xs"
+                }`}>
                   <div className="flex items-center justify-between pointer-events-auto">
                     <div className="flex items-center space-x-1 min-w-0">
-                      <span className="shrink-0">{detail.icon}</span>
+                      <span className="shrink-0" style={{ color: detail.color }}>{detail.icon}</span>
                       <span className={`text-[9.5px] font-black truncate ${isDark ? "text-slate-350" : "text-slate-700"}`}>
                         {detail.title}
                       </span>
@@ -453,7 +456,8 @@ export default function InputPanel({
                         e.stopPropagation();
                         setActiveTooltip(tooltipActive ? null : cardId);
                       }}
-                      className="text-slate-500 hover:text-indigo-400 focus:outline-none shrink-0"
+                      className="text-slate-500 hover:text-[#355c7d] focus:outline-none shrink-0"
+                      style={{ color: tooltipActive ? detail.color : undefined }}
                     >
                       <HelpCircle className="w-2.5 h-2.5" />
                     </button>
@@ -463,22 +467,13 @@ export default function InputPanel({
                     <div className={`absolute left-1 right-1 top-7.5 z-50 text-[9px] leading-relaxed p-1.5 rounded-lg border ${
                       isDark 
                         ? "bg-slate-950 text-slate-300 border-slate-850" 
-                        : "bg-white text-slate-600 border-slate-200 shadow-md"
+                        : "bg-white text-slate-650 border-slate-200 shadow-md"
                     }`}>
                       {getHelpContent(cardId)}
                     </div>
                   )}
 
-                  <div className="text-right py-0.5 flex items-center justify-between">
-                    {cardId === "depositYears" ? (
-                      <span className={`text-[8.5px] font-black tracking-tight px-1 py-0.2 rounded border select-none ${
-                        isDark 
-                          ? "bg-amber-500/10 border-amber-500/20 text-amber-400" 
-                          : "bg-amber-50 border-amber-100 text-amber-600"
-                      }`}>
-                        완료: {inputs.startAge + val}세
-                      </span>
-                    ) : <span />}
+                  <div className="text-right py-0.5">
                     <span className={`text-xs font-black font-mono ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                       {val.toLocaleString()}{detail.unit}
                     </span>
@@ -493,6 +488,10 @@ export default function InputPanel({
                           ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
                           : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
                       }`}
+                      style={{
+                        borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                        color: detail.color
+                      }}
                     >
                       －
                     </button>
@@ -505,7 +504,11 @@ export default function InputPanel({
                       onChange={(e) => {
                         onInputChange({ [detail.key]: parseFloat(e.target.value) });
                       }}
-                      className="flex-1 min-w-0 accent-indigo-500 h-0.5 bg-slate-300 dark:bg-slate-850 rounded cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, ${detail.color} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                        "--thumb-color": detail.color,
+                      } as React.CSSProperties}
+                      className="flex-1 min-w-0 h-1 rounded cursor-pointer"
                     />
                     <button
                       type="button"
@@ -515,13 +518,326 @@ export default function InputPanel({
                           ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
                           : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
                       }`}
+                      style={{
+                        borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                        color: detail.color
+                      }}
                     >
                       ＋
                     </button>
                   </div>
                 </div>
               );
-            })}
+            })()}
+
+            {/* 시작 나이 (Full Row Card) */}
+            {(() => {
+              const cardId = "startAge";
+              const detail = getCardDetails(cardId);
+              const val = inputs[detail.key] as number;
+              const tooltipActive = activeTooltip === cardId;
+              return (
+                <div className={`flex flex-col justify-between p-2 rounded-xl border transition-all duration-300 relative select-none ${
+                  isDark 
+                    ? "bg-slate-900/40 border-slate-800/80 hover:border-slate-700/60" 
+                    : "bg-white border-slate-200 hover:bg-white hover:border-[#355c7d]/40 hover:shadow-2xs"
+                }`}>
+                  <div className="flex items-center justify-between pointer-events-auto">
+                    <div className="flex items-center space-x-1 min-w-0">
+                      <span className="shrink-0" style={{ color: detail.color }}>{detail.icon}</span>
+                      <span className={`text-[9.5px] font-black truncate ${isDark ? "text-slate-350" : "text-slate-700"}`}>
+                        {detail.title}
+                      </span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveTooltip(tooltipActive ? null : cardId);
+                      }}
+                      className="text-slate-500 hover:text-[#355c7d] focus:outline-none shrink-0"
+                      style={{ color: tooltipActive ? detail.color : undefined }}
+                    >
+                      <HelpCircle className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+
+                  {tooltipActive && (
+                    <div className={`absolute left-1 right-1 top-7.5 z-50 text-[9px] leading-relaxed p-1.5 rounded-lg border ${
+                      isDark 
+                        ? "bg-slate-950 text-slate-300 border-slate-850" 
+                        : "bg-white text-slate-650 border-slate-200 shadow-md"
+                    }`}>
+                      {getHelpContent(cardId)}
+                    </div>
+                  )}
+
+                  <div className="text-right py-0.5">
+                    <span className={`text-xs font-black font-mono ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                      {val.toLocaleString()}{detail.unit}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center space-x-1 mt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
+                      className={`w-4 h-4 rounded font-bold text-[9px] flex items-center justify-center transition focus:outline-none border shrink-0 ${
+                        isDark 
+                          ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                          : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
+                      }`}
+                      style={{
+                        borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                        color: detail.color
+                      }}
+                    >
+                      －
+                    </button>
+                    <input
+                      type="range"
+                      min={detail.min}
+                      max={detail.max}
+                      step={detail.step}
+                      value={val}
+                      onChange={(e) => {
+                        onInputChange({ [detail.key]: parseFloat(e.target.value) });
+                      }}
+                      style={{
+                        background: `linear-gradient(to right, ${detail.color} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                        "--thumb-color": detail.color,
+                      } as React.CSSProperties}
+                      className="flex-1 min-w-0 h-1 rounded cursor-pointer"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
+                      className={`w-4 h-4 rounded font-bold text-[9px] flex items-center justify-center transition focus:outline-none border shrink-0 ${
+                        isDark 
+                          ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                          : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
+                      }`}
+                      style={{
+                        borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                        color: detail.color
+                      }}
+                    >
+                      ＋
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* 개시나이, 납입기간 (1x2 Compact Row) */}
+            <div className="grid grid-cols-2 gap-2">
+              {/* 개시 나이 */}
+              {(() => {
+                const cardId = "endAge";
+                const detail = getCardDetails(cardId);
+                const val = inputs[detail.key] as number;
+                const tooltipActive = activeTooltip === cardId;
+                return (
+                  <div className={`flex flex-col justify-between p-2 rounded-xl border transition-all duration-300 relative select-none ${
+                    isDark 
+                      ? "bg-slate-900/40 border-slate-800/80 hover:border-slate-700/60" 
+                      : "bg-white border-slate-200 hover:bg-white hover:border-[#355c7d]/40 hover:shadow-2xs"
+                  }`}>
+                    <div className="flex items-center justify-between pointer-events-auto">
+                      <div className="flex items-center space-x-1 min-w-0">
+                        <span className="shrink-0" style={{ color: detail.color }}>{detail.icon}</span>
+                        <span className={`text-[9.5px] font-black truncate ${isDark ? "text-slate-350" : "text-slate-700"}`}>
+                          {detail.title}
+                        </span>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTooltip(tooltipActive ? null : cardId);
+                        }}
+                        className="text-slate-500 hover:text-[#355c7d] focus:outline-none shrink-0"
+                        style={{ color: tooltipActive ? detail.color : undefined }}
+                      >
+                        <HelpCircle className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+
+                    {tooltipActive && (
+                      <div className={`absolute left-1 right-1 top-7.5 z-50 text-[9px] leading-relaxed p-1.5 rounded-lg border ${
+                        isDark 
+                          ? "bg-slate-950 text-slate-300 border-slate-850" 
+                          : "bg-white text-slate-650 border-slate-200 shadow-md"
+                      }`}>
+                        {getHelpContent(cardId)}
+                      </div>
+                    )}
+
+                    <div className="text-right py-0.5">
+                      <span className={`text-xs font-black font-mono ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                        {val.toLocaleString()}{detail.unit}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-1 mt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
+                        className={`w-4 h-4 rounded font-bold text-[9px] flex items-center justify-center transition focus:outline-none border shrink-0 ${
+                          isDark 
+                            ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
+                        }`}
+                        style={{
+                          borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                          color: detail.color
+                        }}
+                      >
+                        －
+                      </button>
+                      <input
+                        type="range"
+                        min={detail.min}
+                        max={detail.max}
+                        step={detail.step}
+                        value={val}
+                        onChange={(e) => {
+                          onInputChange({ [detail.key]: parseFloat(e.target.value) });
+                        }}
+                        style={{
+                          background: `linear-gradient(to right, ${detail.color} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                          "--thumb-color": detail.color,
+                        } as React.CSSProperties}
+                        className="flex-1 min-w-0 h-1 rounded cursor-pointer"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
+                        className={`w-4 h-4 rounded font-bold text-[9px] flex items-center justify-center transition focus:outline-none border shrink-0 ${
+                          isDark 
+                            ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
+                        }`}
+                        style={{
+                          borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                          color: detail.color
+                        }}
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* 납입 기간 */}
+              {(() => {
+                const cardId = "depositYears";
+                const detail = getCardDetails(cardId);
+                const val = inputs[detail.key] as number;
+                const tooltipActive = activeTooltip === cardId;
+                return (
+                  <div className={`flex flex-col justify-between p-2 rounded-xl border transition-all duration-300 relative select-none ${
+                    isDark 
+                      ? "bg-slate-900/40 border-slate-800/80 hover:border-slate-700/60" 
+                      : "bg-white border-slate-200 hover:bg-white hover:border-[#355c7d]/40 hover:shadow-2xs"
+                  }`}>
+                    <div className="flex items-center justify-between pointer-events-auto">
+                      <div className="flex items-center space-x-1 min-w-0">
+                        <span className="shrink-0" style={{ color: detail.color }}>{detail.icon}</span>
+                        <span className={`text-[9.5px] font-black truncate ${isDark ? "text-slate-350" : "text-slate-700"}`}>
+                          {detail.title}
+                        </span>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTooltip(tooltipActive ? null : cardId);
+                        }}
+                        className="text-slate-500 hover:text-[#355c7d] focus:outline-none shrink-0"
+                        style={{ color: tooltipActive ? detail.color : undefined }}
+                      >
+                        <HelpCircle className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+
+                    {tooltipActive && (
+                      <div className={`absolute left-1 right-1 top-7.5 z-50 text-[9px] leading-relaxed p-1.5 rounded-lg border ${
+                        isDark 
+                          ? "bg-slate-950 text-slate-300 border-slate-850" 
+                          : "bg-white text-slate-650 border-slate-200 shadow-md"
+                      }`}>
+                        {getHelpContent(cardId)}
+                      </div>
+                    )}
+
+                    <div className="text-right py-0.5 flex items-center justify-between">
+                      {inputs.depositYears < (inputs.endAge - inputs.startAge) ? (
+                        <span className={`text-[8.5px] font-black tracking-tight px-1 py-0.2 rounded border select-none ${
+                          isDark 
+                            ? "bg-amber-500/10 border-amber-500/20 text-amber-400" 
+                            : "bg-amber-50 border-amber-100 text-amber-600"
+                        }`}>
+                          완료: {inputs.startAge + val}세
+                        </span>
+                      ) : <span />}
+                      <span className={`text-xs font-black font-mono ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                        {val}년({inputs.startAge + val}세)
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-1 mt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
+                        className={`w-4 h-4 rounded font-bold text-[9px] flex items-center justify-center transition focus:outline-none border shrink-0 ${
+                          isDark 
+                            ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
+                        }`}
+                        style={{
+                          borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                          color: detail.color
+                        }}
+                      >
+                        －
+                      </button>
+                      <input
+                        type="range"
+                        min={detail.min}
+                        max={detail.max}
+                        step={detail.step}
+                        value={val}
+                        onChange={(e) => {
+                          onInputChange({ [detail.key]: parseFloat(e.target.value) });
+                        }}
+                        style={{
+                          background: `linear-gradient(to right, ${detail.color} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                          "--thumb-color": detail.color,
+                        } as React.CSSProperties}
+                        className="flex-1 min-w-0 h-1 rounded cursor-pointer"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
+                        className={`w-4 h-4 rounded font-bold text-[9px] flex items-center justify-center transition focus:outline-none border shrink-0 ${
+                          isDark 
+                            ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-95 shadow-2xs"
+                        }`}
+                        style={{
+                          borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                          color: detail.color
+                        }}
+                      >
+                        ＋
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         </div>
 
@@ -533,9 +849,9 @@ export default function InputPanel({
               : "bg-slate-50 border-slate-200/90 text-slate-800 shadow-sm"
           }`}>
             <div className={`flex items-center justify-between border-b pb-1.5 mb-2 border-dashed ${
-              isDark ? "border-slate-800" : "border-slate-150"
+              isDark ? "border-slate-800" : "border-slate-200"
             }`}>
-              <h4 className="text-[10px] font-bold flex items-center gap-1.5 text-indigo-400">
+              <h4 className="text-[10px] font-bold flex items-center gap-1.5 text-[#f67280]">
                 <Award className="w-3.5 h-3.5" />
                 세법 적용: 이자·수령 과세 전액 면제 (비과세)
               </h4>
@@ -551,10 +867,10 @@ export default function InputPanel({
               : "bg-slate-50 border-slate-200/95 text-slate-800"
           }`}>
             <div className={`flex items-center justify-between border-b pb-1.5 border-dashed ${
-              isDark ? "border-slate-800" : "border-slate-150"
+              isDark ? "border-slate-800" : "border-slate-200"
             }`}>
-              <h4 className="text-[10px] font-bold flex items-center space-x-1.5">
-                <Award className={`w-3.5 h-3.5 ${isDark ? "text-[#A7AAE1]" : "text-[#696FC7]"}`} />
+              <h4 className="text-[10px] font-bold flex items-center space-x-1.5" style={{ color: activeColor }}>
+                <Award className="w-3.5 h-3.5" style={{ color: activeColor }} />
                 <span>세액공제 환급금 재투자 설정 (연 900만원 한도)</span>
               </h4>
             </div>
@@ -563,24 +879,24 @@ export default function InputPanel({
               {/* Toggle 1: 세액공제 재투자 ON/OFF */}
               <div className="flex flex-col space-y-1">
                 <span className={`text-[9px] font-bold flex items-center ${isDark ? "text-slate-500" : "text-slate-600"}`}>
-                  <RefreshCw className={`w-3 h-3 mr-1 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+                  <RefreshCw className="w-3 h-3 mr-1" style={{ color: activeColor }} />
                   환급금 재투자 여부
                 </span>
                 <div className="flex select-none">
                   <button
                     type="button"
                     onClick={() => onInputChange({ reinvestTaxCredit: true })}
-                    className={`flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer`}
+                    className="flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer"
                     style={{
                       backgroundColor: inputs.reinvestTaxCredit 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "#1e293b" : "#f1f5f9"),
                       color: inputs.reinvestTaxCredit ? "#ffffff" : "#64748b",
                       borderRadius: "6px 0 0 6px",
                       height: "24px",
                       fontSize: "10.5px",
                       border: "1px solid " + (inputs.reinvestTaxCredit 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "rgba(100, 116, 139, 0.2)" : "rgba(100, 116, 139, 0.15)")),
                     }}
                   >
@@ -589,17 +905,17 @@ export default function InputPanel({
                   <button
                     type="button"
                     onClick={() => onInputChange({ reinvestTaxCredit: false })}
-                    className={`flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer`}
+                    className="flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer"
                     style={{
                       backgroundColor: !inputs.reinvestTaxCredit 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "#1e293b" : "#f1f5f9"),
                       color: !inputs.reinvestTaxCredit ? "#ffffff" : "#64748b",
                       borderRadius: "0 6px 6px 0",
                       height: "24px",
                       fontSize: "10.5px",
                       border: "1px solid " + (!inputs.reinvestTaxCredit 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "rgba(100, 116, 139, 0.2)" : "rgba(100, 116, 139, 0.15)")),
                     }}
                   >
@@ -611,24 +927,24 @@ export default function InputPanel({
               {/* Toggle 2: 세액공제율 선택 (13.2% vs 16.5%) */}
               <div className="flex flex-col space-y-1">
                 <span className={`text-[9px] font-bold flex items-center ${isDark ? "text-slate-500" : "text-slate-600"}`}>
-                  <Percent className={`w-3 h-3 mr-1 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
-                  소득형태별 공제율
+                  <Percent className="w-3 h-3 mr-1" style={{ color: activeColor }} />
+                  공제율
                 </span>
                 <div className="flex select-none">
                   <button
                     type="button"
                     onClick={() => onInputChange({ taxCreditRate: 13.2 })}
-                    className={`flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer`}
+                    className="flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer"
                     style={{
                       backgroundColor: inputs.taxCreditRate === 13.2 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "#1e293b" : "#f1f5f9"),
                       color: inputs.taxCreditRate === 13.2 ? "#ffffff" : "#64748b",
                       borderRadius: "6px 0 0 6px",
                       height: "24px",
                       fontSize: "10.5px",
                       border: "1px solid " + (inputs.taxCreditRate === 13.2 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "rgba(100, 116, 139, 0.2)" : "rgba(100, 116, 139, 0.15)")),
                     }}
                   >
@@ -637,17 +953,17 @@ export default function InputPanel({
                   <button
                     type="button"
                     onClick={() => onInputChange({ taxCreditRate: 16.5 })}
-                    className={`flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer`}
+                    className="flex-1 text-center font-bold tracking-wide transition flex items-center justify-center cursor-pointer"
                     style={{
                       backgroundColor: inputs.taxCreditRate === 16.5 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "#1e293b" : "#f1f5f9"),
                       color: inputs.taxCreditRate === 16.5 ? "#ffffff" : "#64748b",
                       borderRadius: "0 6px 6px 0",
                       height: "24px",
                       fontSize: "10.5px",
                       border: "1px solid " + (inputs.taxCreditRate === 16.5 
-                        ? (isDark ? "#6366f1" : "#4f46e5") 
+                        ? activeColor 
                         : (isDark ? "rgba(100, 116, 139, 0.2)" : "rgba(100, 116, 139, 0.15)")),
                     }}
                   >
@@ -663,7 +979,7 @@ export default function InputPanel({
                 isDark ? "bg-slate-950/40 border-slate-800/40" : "bg-white border-slate-150"
               }`}>
                 <div className={`text-[8px] font-bold mb-0.5 flex items-center ${isDark ? "text-slate-500" : "text-slate-500"}`} title="연간 예상 환급액">
-                  <Landmark className="w-2 h-2 mr-0.5 text-indigo-400 shrink-0" />
+                  <Landmark className="w-2 h-2 mr-0.5 shrink-0" style={{ color: activeColor }} />
                   <span className="truncate">연간 환급액</span>
                 </div>
                 <div className={`text-[11px] font-black font-mono ${isDark ? "text-slate-200" : "text-slate-800"}`}>
@@ -675,10 +991,10 @@ export default function InputPanel({
                 isDark ? "bg-slate-950/40 border-slate-800/40" : "bg-white border-slate-150"
               }`}>
                 <div className={`text-[8px] font-bold mb-0.5 flex items-center ${isDark ? "text-slate-500" : "text-slate-500"}`} title="재투자 효과 차액">
-                  <TrendingUp className="w-2 h-2 mr-0.5 text-indigo-400 shrink-0" />
+                  <TrendingUp className="w-2 h-2 mr-0.5 shrink-0" style={{ color: activeColor }} />
                   <span className="truncate">재투자 차액</span>
                 </div>
-                <div className={`text-[11px] font-black font-mono ${isDark ? "text-indigo-450" : "text-indigo-650"}`}>
+                <div className="text-[11px] font-black font-mono" style={{ color: activeColor }}>
                   +{yLabel(reinvestmentEffect)}
                 </div>
               </div>
@@ -720,46 +1036,47 @@ export default function InputPanel({
                 type="button"
                 id="payout-method-fixed"
                 onClick={() => onInputChange({ payoutMethod: "fixed" })}
-                className={`py-1 px-1.5 rounded-lg text-[10px] font-black tracking-tight transition cursor-pointer border ${
-                  inputs.payoutMethod === "fixed"
-                    ? isDark ? "bg-slate-800 text-indigo-400 border-indigo-500/35 font-bold" : "bg-white text-indigo-600 border-indigo-550/30 shadow-xs font-bold"
-                    : isDark ? "bg-transparent text-slate-500 border-slate-800 opacity-60" : "bg-transparent text-slate-400 border-slate-200 opacity-70"
-                }`}
+                className="py-1 px-1.5 rounded-lg text-[10px] font-black tracking-tight transition cursor-pointer border"
+                style={{
+                  backgroundColor: inputs.payoutMethod === "fixed" ? (isDark ? "rgba(246, 114, 128, 0.15)" : "#ffffff") : "transparent",
+                  color: inputs.payoutMethod === "fixed" ? "#f67280" : (isDark ? "#64748b" : "#94a3b8"),
+                  borderColor: inputs.payoutMethod === "fixed" ? "#f67280" : (isDark ? "#334155" : "#e2e8f0"),
+                  fontWeight: "bold",
+                }}
               >
-                확정기간형 (5~20년)
+                확정형
               </button>
               <button
                 type="button"
                 id="payout-method-lifetime"
                 onClick={() => onInputChange({ payoutMethod: "lifetime" })}
-                className={`py-1 px-1.5 rounded-lg text-[10px] font-black tracking-tight transition cursor-pointer border ${
-                  inputs.payoutMethod === "lifetime"
-                    ? isDark ? "bg-slate-800 text-indigo-400 border-indigo-500/35 font-bold" : "bg-white text-indigo-600 border-indigo-550/30 shadow-xs font-bold"
-                    : isDark ? "bg-transparent text-slate-500 border-slate-800 opacity-60" : "bg-transparent text-slate-400 border-slate-200 opacity-70"
-                }`}
+                className="py-1 px-1.5 rounded-lg text-[10px] font-black tracking-tight transition cursor-pointer border"
+                style={{
+                  backgroundColor: inputs.payoutMethod === "lifetime" ? (isDark ? "rgba(246, 114, 128, 0.15)" : "#ffffff") : "transparent",
+                  color: inputs.payoutMethod === "lifetime" ? "#f67280" : (isDark ? "#64748b" : "#94a3b8"),
+                  borderColor: inputs.payoutMethod === "lifetime" ? "#f67280" : (isDark ? "#334155" : "#e2e8f0"),
+                  fontWeight: "bold",
+                }}
               >
-                종신연금형 (10년보증)
+                종신형
               </button>
             </div>
           </div>
         )}
 
-        {/* Hybrid Information message indicator */}
+        {/* Hybrid Information Banner */}
         {inputs.simulationType === "hybrid" && (
-          <div className={`p-2.5 rounded-lg border mb-3 select-none text-[10px] leading-relaxed ${
+          <div className={`p-3 rounded-xl border text-left select-none text-[10px] leading-relaxed mb-3.5 ${
             isDark 
-              ? "bg-slate-950/45 border-slate-800/60 text-slate-400" 
-              : "bg-slate-50 border-slate-205 text-slate-600"
-          }`}>
-            💡 <span className="font-bold text-[#A7AAE1]">하이브리드:</span> 적립기 동안 연금저축펀드에서 세액공제를 최대한 받고, 은퇴 시 연계액 총합을 보험사로 전산 이관하여 비과세 종신연금으로 영속 수령하게 설계됩니다.
+              ? "bg-slate-950/40 border-slate-800 text-slate-300" 
+              : "bg-purple-50/20 border-purple-100 text-slate-700"
+          }`}
+               style={{ borderColor: isDark ? "rgba(108, 91, 123, 0.3)" : "rgba(108, 91, 123, 0.2)" }}>
+            <p>
+              🔮 <strong>하이브리드 방식</strong>은 연금저축펀드(보라빛파랑)와 연금보험(빨강)의 핵심 특장점을 정밀하고 유연하게 결합하여 포트폴리오를 구성한 혁신적 은퇴 설계 패러다임입니다.
+            </p>
           </div>
         )}
-
-        <p className={`text-[9px] leading-normal font-medium mb-3 transition-colors duration-300 ${
-          isDark ? "text-slate-500" : "text-slate-400"
-        }`}>
-          * 아래 카드는 드래그하거나 미세 조정 화살표를 눌러 정렬 우선순위를 변경할 수 있습니다.
-        </p>
 
         {/* Grid wrapper for Drag & Drop items (3x2 Grid or 1col) */}
         {listCards.length > 0 && (
@@ -781,15 +1098,18 @@ export default function InputPanel({
                     draggedId === cardId ? "opacity-30 scale-95" : ""
                   } ${
                     isDark 
-                      ? "bg-slate-950/60 border-slate-800/80 hover:border-indigo-500/40 hover:bg-slate-950/90" 
-                      : "bg-slate-50 border-slate-200 hover:border-indigo-400/50 hover:bg-white hover:shadow-xs"
+                      ? "bg-slate-950/60 border-slate-800/80 hover:bg-slate-950/90" 
+                      : "bg-slate-50 border-slate-200 hover:bg-white hover:shadow-xs"
                   }`}
+                  style={{
+                    borderColor: draggedId === cardId ? undefined : (isDark ? `${detail.color}20` : "rgba(100, 116, 139, 0.15)"),
+                  }}
                 >
                   {/* Card Header */}
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center space-x-1.5 min-w-0">
-                      <div className="p-1 rounded bg-indigo-550/10 flex items-center justify-center pointer-events-none">
-                        <GripVertical className={`w-3 h-3 ${isDark ? "text-slate-600 group-hover:text-indigo-400" : "text-slate-450 group-hover:text-indigo-500"}`} />
+                      <div className="p-1 rounded flex items-center justify-center pointer-events-none" style={{ backgroundColor: `${detail.color}12` }}>
+                        <GripVertical className="w-3 h-3" style={{ color: detail.color }} />
                       </div>
                       <span className={`text-[10.5px] font-black truncate  ${isDark ? "text-slate-300" : "text-slate-700"}`}>
                         {detail.title}
@@ -799,7 +1119,8 @@ export default function InputPanel({
                           e.stopPropagation();
                           setActiveTooltip(tooltipActive ? null : cardId);
                         }}
-                        className="text-slate-500 hover:text-indigo-505 focus:outline-none"
+                        className="text-slate-500 hover:text-slate-700 focus:outline-none"
+                        style={{ color: tooltipActive ? detail.color : undefined }}
                       >
                         <HelpCircle className="w-2.5 h-2.5" />
                       </button>
@@ -817,7 +1138,7 @@ export default function InputPanel({
                         className={`p-0.5 rounded transition focus:outline-none ${
                           index === 0
                             ? "opacity-20 cursor-not-allowed"
-                            : "hover:bg-indigo-500/10 text-slate-450 hover:text-indigo-400"
+                            : "hover:bg-slate-200/50 text-slate-400 hover:text-slate-750"
                         }`}
                         title="앞으로 이동"
                       >
@@ -833,7 +1154,7 @@ export default function InputPanel({
                         className={`p-0.5 rounded transition focus:outline-none ${
                           index === listCards.length - 1
                             ? "opacity-20 cursor-not-allowed"
-                            : "hover:bg-indigo-500/10 text-slate-450 hover:text-indigo-400"
+                            : "hover:bg-slate-200/50 text-slate-400 hover:text-slate-750"
                         }`}
                         title="뒤로 이동"
                       >
@@ -847,8 +1168,9 @@ export default function InputPanel({
                     <div className={`text-[9.5px] leading-relaxed p-1.5 rounded-lg border mb-2 select-none z-10 ${
                       isDark 
                         ? "bg-slate-900 text-slate-300 border-slate-800" 
-                        : "bg-white text-slate-600 border-slate-150 shadow-sm"
-                    }`}>
+                        : "bg-white text-slate-650 border-slate-200 shadow-sm"
+                    }`}
+                         style={{ borderColor: `${detail.color}25` }}>
                       {getHelpContent(cardId)}
                     </div>
                   )}
@@ -857,15 +1179,17 @@ export default function InputPanel({
                   <div className="flex flex-col mb-1.5 gap-0.5">
                     <div className="flex items-baseline justify-between">
                       <span className={`text-[9.5px] font-bold ${isDark ? "text-slate-500" : "text-slate-400"}`}>설정 수치</span>
-                      <span className={`text-xs font-black font-mono transition-colors ${
-                        cardId === "annualWithdrawal" 
-                          ? "text-[#F2AEBB]" 
-                          : isDark ? "text-slate-100" : "text-slate-900"
-                      }`}>
+                      <span className="text-xs font-black font-mono transition-colors" style={{ color: detail.color }}>
                         {cardId === "annualWithdrawal" ? (
                           <span className="flex items-center space-x-1.5">
                             <span>{val.toLocaleString()}만원</span>
-                            <span className={`text-[8.5px] px-1 py-0.5 rounded border border-indigo-500/25 text-indigo-400 bg-indigo-500/10`} title="개시시점 잔액 대비 연 수령 비중">
+                            <span className="text-[8.5px] px-1 py-0.5 rounded border"
+                                  style={{
+                                    borderColor: `${detail.color}35`,
+                                    color: detail.color,
+                                    backgroundColor: `${detail.color}10`
+                                  }}
+                                  title="개시시점 잔액 대비 연 수령 비중">
                               {withdrawRatio.toFixed(1)}%
                             </span>
                           </span>
@@ -885,9 +1209,13 @@ export default function InputPanel({
                       }}
                       className={`w-4.5 h-4.5 shrink-0 flex-none rounded-md font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
                         isDark 
-                          ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-90" 
-                          : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-90 shadow-2xs"
+                          ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-90" 
+                          : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700 active:scale-90 shadow-2xs"
                       }`}
+                      style={{
+                        borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                        color: detail.color
+                      }}
                     >
                       －
                     </button>
@@ -901,7 +1229,11 @@ export default function InputPanel({
                         onInputChange({ [detail.key]: parseFloat(e.target.value) });
                       }}
                       onClick={(e) => e.stopPropagation()} // Prevent trigger drag
-                      className="flex-1 min-w-0 w-full accent-indigo-500 h-1 bg-slate-300 dark:bg-slate-800 rounded cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, ${detail.color} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                        "--thumb-color": detail.color,
+                      } as React.CSSProperties}
+                      className="flex-1 min-w-0 w-full h-1 rounded cursor-pointer"
                     />
                     <button
                       onClick={(e) => {
@@ -910,9 +1242,13 @@ export default function InputPanel({
                       }}
                       className={`w-4.5 h-4.5 shrink-0 flex-none rounded-md font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
                         isDark 
-                          ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-90" 
-                          : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-90 shadow-2xs"
+                          ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-90" 
+                          : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700 active:scale-90 shadow-2xs"
                       }`}
+                      style={{
+                        borderColor: isDark ? `${detail.color}25` : `${detail.color}35`,
+                        color: detail.color
+                      }}
                     >
                       ＋
                     </button>
@@ -924,208 +1260,224 @@ export default function InputPanel({
         )}
 
         {/* Special 1x1 & 1x2 Fixed Section for Insurance Lifetime Annuity Rates */}
-        {showInsuranceAnnuitySection && (
-          <div className="mt-4 space-y-3 pt-4 border-t border-slate-800/15">
-            <h4 className={`text-[10px] font-black uppercase tracking-wider ${isDark ? "text-[#A7AAE1]" : "text-[#696FC7]"}`}>
-              종신 연금수령 지급률 설정
-            </h4>
+        {showInsuranceAnnuitySection && (() => {
+          const activeColor = inputs.simulationType === "hybrid" ? "#6C5B7B" : "#f67280";
+          return (
+            <div className="mt-4 space-y-3 pt-4 border-t border-slate-800/15">
+              <h4 className="text-[10px] font-black uppercase tracking-wider block" style={{ color: activeColor }}>
+                종신 연금수령 지급률 설정
+              </h4>
 
-            {/* (카드 1x1) 연금연액비율 카드 */}
-            <div className={`p-4 rounded-xl border flex flex-col justify-center relative overflow-hidden transition-all duration-300 shadow-sm ${
-              isDark 
-                ? "bg-slate-900 border-slate-800/80 text-white" 
-                : "bg-indigo-50/50 border-indigo-200 text-slate-800 shadow-sm"
-            }`}>
-              <div className="absolute top-0 left-0 w-1.5 h-full bg-[#6366f1]"></div>
-              
-              <div className="flex justify-between items-center mb-1">
-                <div className={`text-[10.5px] font-black tracking-wider uppercase flex items-center ${isDark ? "text-indigo-300" : "text-indigo-600"}`}>
-                  <Percent className="w-3.5 h-3.5 mr-1" />
-                  연금연액비율
+              {/* (카드 1x1) 연금연액비율 카드 */}
+              <div className={`p-4 rounded-xl border flex flex-col justify-center relative overflow-hidden transition-all duration-300 shadow-sm ${
+                isDark 
+                  ? "bg-slate-900 text-white" 
+                  : "bg-slate-50/50 text-slate-800 shadow-sm"
+              }`}
+                   style={{ borderColor: `${activeColor}30` }}>
+                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: activeColor }}></div>
+                
+                <div className="flex justify-between items-center mb-1">
+                  <div className="text-[10.5px] font-black tracking-wider uppercase flex items-center" style={{ color: activeColor }}>
+                    <Percent className="w-3.5 h-3.5 mr-1" />
+                    연금연액비율
+                  </div>
+                  <span className="text-[9.5px] font-bold px-2 py-0.5 rounded"
+                        style={{ backgroundColor: `${activeColor}15`, color: activeColor }}>
+                    자동 계산 결과
+                  </span>
                 </div>
-                <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded ${
-                  isDark ? "bg-[#6366f1]/15 text-[#A7AAE1]" : "bg-[#6366f1]/10 text-indigo-700"
-                }`}>
-                  자동 계산 결과
-                </span>
+
+                <div className="flex items-baseline justify-between mt-1.5">
+                  <div className="text-xl md:text-2xl font-black tracking-tight font-sans">
+                    {inputs.annuityPayoutRate.toFixed(2)}%
+                  </div>
+                  <div className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    지급률 산식: {inputs.insuranceAnnuityRate.toFixed(1)}% (기본 비율) × ({inputs.illHealthEffect}%)
+                  </div>
+                </div>
               </div>
 
-              <div className="flex items-baseline justify-between mt-1.5">
-                <div className="text-xl md:text-2xl font-black tracking-tight font-sans">
-                  {inputs.annuityPayoutRate.toFixed(2)}%
-                </div>
-                <div className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                  지급률 산식: {inputs.insuranceAnnuityRate.toFixed(1)}% (기본 비율) × ({inputs.illHealthEffect}%)
-                </div>
+              {/* (카드 1x2) 종신연금비율 & 유병자연금 효과 조정 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* 종신연금비율 카드 */}
+                {(() => {
+                  const detail = getCardDetails("insuranceAnnuityRate");
+                  const val = inputs.insuranceAnnuityRate;
+                  const tooltipActive = activeTooltip === "insuranceAnnuityRate";
+                  return (
+                    <div className={`flex flex-col justify-between p-3 rounded-xl border transition-all duration-300 relative select-none ${
+                      isDark 
+                        ? "bg-slate-950/60 border-slate-800/80 hover:bg-slate-950/90" 
+                        : "bg-slate-50 border-slate-200 hover:bg-white hover:shadow"
+                    }`}
+                         style={{ borderColor: `${activeColor}20` }}>
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className={`text-[10.5px] font-black truncate ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                          {detail.title}
+                        </span>
+                        <button 
+                          onClick={() => setActiveTooltip(tooltipActive ? null : "insuranceAnnuityRate")}
+                          className="text-slate-500 hover:text-slate-700 focus:outline-none"
+                        >
+                          <HelpCircle className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+
+                      {tooltipActive && (
+                        <div className={`text-[9.5px] leading-relaxed p-1.5 rounded-lg border mb-2 select-none ${
+                          isDark ? "bg-slate-900 text-slate-300 border-slate-800" : "bg-white text-slate-650 border-slate-150 shadow-sm"
+                        }`}
+                             style={{ borderColor: `${activeColor}25` }}>
+                          {getHelpContent("insuranceAnnuityRate")}
+                        </div>
+                      )}
+
+                      {/* Value */}
+                      <div className="flex items-baseline justify-between mb-1.5 min-h-[18px]">
+                        <span className={`text-[9.5px] font-bold ${isDark ? "text-slate-500" : "text-slate-400"}`}>설정 비율</span>
+                        <span className="text-xs font-black font-sans transition-colors flex items-center space-x-1.5" style={{ color: activeColor }}>
+                          <span>{val.toFixed(1)}%</span>
+                          <span className="text-[8.5px] px-1 py-0.2 rounded font-sans font-bold"
+                                style={{ backgroundColor: `${activeColor}15`, color: activeColor }}>
+                            기본 비율
+                          </span>
+                        </span>
+                      </div>
+
+                      {/* Slider */}
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
+                          className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
+                            isDark 
+                              ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                              : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700 active:scale-95 shadow-2xs"
+                          }`}
+                          style={{ borderColor: `${activeColor}25`, color: activeColor }}
+                        >
+                          －
+                        </button>
+                        <input
+                          type="range"
+                          min={detail.min}
+                          max={detail.max}
+                          step={detail.step}
+                          value={val}
+                          onChange={(e) => onInputChange({ [detail.key]: parseFloat(e.target.value) })}
+                          style={{
+                            background: `linear-gradient(to right, ${activeColor} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                            "--thumb-color": activeColor,
+                          } as React.CSSProperties}
+                          className="flex-1 min-w-0 w-full h-1 rounded cursor-pointer"
+                        />
+                        <button
+                          onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
+                          className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
+                            isDark 
+                              ? "bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300 active:scale-95" 
+                              : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700 active:scale-95 shadow-2xs"
+                          }`}
+                          style={{ borderColor: `${activeColor}25`, color: activeColor }}
+                        >
+                          ＋
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* 유병자연금 효과 카드 */}
+                {(() => {
+                  const detail = getCardDetails("illHealthEffect");
+                  const val = inputs.illHealthEffect;
+                  const tooltipActive = activeTooltip === "illHealthEffect";
+                  return (
+                    <div className={`flex flex-col justify-between p-3 rounded-xl border transition-all duration-300 relative select-none ${
+                      isDark 
+                        ? "bg-slate-950/60 border-slate-800/80 hover:bg-slate-950/90" 
+                        : "bg-slate-50 border-slate-200 hover:bg-white hover:shadow"
+                    }`}
+                         style={{ borderColor: `${activeColor}20` }}>
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className={`text-[10.5px] font-black truncate ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                          {detail.title}
+                        </span>
+                        <button 
+                          onClick={() => setActiveTooltip(tooltipActive ? null : "illHealthEffect")}
+                          className="text-slate-500 hover:text-slate-705 focus:outline-none"
+                        >
+                          <HelpCircle className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+
+                      {tooltipActive && (
+                        <div className={`text-[9.5px] leading-relaxed p-1.5 rounded-lg border mb-2 select-none ${
+                          isDark ? "bg-slate-900 text-slate-300 border-slate-800" : "bg-white text-slate-650 border-slate-150 shadow-sm"
+                        }`}
+                             style={{ borderColor: `${activeColor}25` }}>
+                          {getHelpContent("illHealthEffect")}
+                        </div>
+                      )}
+
+                      {/* Value */}
+                      <div className="flex items-baseline justify-between mb-1.5 min-h-[18px]">
+                        <span className={`text-[9.5px] font-bold ${isDark ? "text-slate-500" : "text-slate-400"}`}>설정 비율</span>
+                        <span className="text-xs font-black font-sans transition-colors flex items-center space-x-1.5" style={{ color: activeColor }}>
+                          <span>{val.toFixed(1)}%</span>
+                          <span className="text-[8.5px] text-emerald-450 bg-emerald-500/15 border border-emerald-500/25 px-1 py-0.2 rounded font-sans font-bold">
+                            개선 배수
+                          </span>
+                        </span>
+                      </div>
+
+                      {/* Slider */}
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
+                          className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
+                            isDark 
+                              ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-95" 
+                              : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700 active:scale-95 shadow-2xs"
+                          }`}
+                          style={{ borderColor: `${activeColor}25`, color: activeColor }}
+                        >
+                          －
+                        </button>
+                        <input
+                          type="range"
+                          min={detail.min}
+                          max={detail.max}
+                          step={detail.step}
+                          value={val}
+                          onChange={(e) => onInputChange({ [detail.key]: parseFloat(e.target.value) })}
+                          style={{
+                            background: `linear-gradient(to right, ${activeColor} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%, ${isDark ? "#1e293b" : "#cbd5e1"} ${detail.max > detail.min ? ((val - detail.min) / (detail.max - detail.min)) * 100 : 0}%)`,
+                            "--thumb-color": activeColor,
+                          } as React.CSSProperties}
+                          className="flex-1 min-w-0 w-full h-1 rounded cursor-pointer"
+                        />
+                        <button
+                          onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
+                          className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
+                            isDark 
+                              ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-95" 
+                              : "bg-white hover:bg-slate-100 border-slate-200 text-slate-700 active:scale-95 shadow-2xs"
+                          }`}
+                          style={{ borderColor: `${activeColor}25`, color: activeColor }}
+                        >
+                          ＋
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-
-            {/* (카드 1x2) 종신연금비율 & 유병자연금 효과 조정 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* 종신연금비율 카드 */}
-              {(() => {
-                const detail = getCardDetails("insuranceAnnuityRate");
-                const val = inputs.insuranceAnnuityRate;
-                const tooltipActive = activeTooltip === "insuranceAnnuityRate";
-                return (
-                  <div className={`flex flex-col justify-between p-3 rounded-xl border transition-all duration-300 relative select-none ${
-                    isDark 
-                      ? "bg-slate-950/60 border-slate-800/80 hover:bg-slate-950/90" 
-                      : "bg-slate-50 border-slate-200 hover:bg-white hover:shadow"
-                  }`}>
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className={`text-[10.5px] font-black truncate ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                        {detail.title}
-                      </span>
-                      <button 
-                        onClick={() => setActiveTooltip(tooltipActive ? null : "insuranceAnnuityRate")}
-                        className="text-slate-500 hover:text-indigo-500 focus:outline-none"
-                      >
-                        <HelpCircle className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-
-                    {tooltipActive && (
-                      <div className={`text-[9.5px] leading-relaxed p-1.5 rounded-lg border mb-2 select-none ${
-                        isDark ? "bg-slate-900 text-slate-300 border-slate-800" : "bg-white text-slate-650 border-slate-150 shadow-sm"
-                      }`}>
-                        {getHelpContent("insuranceAnnuityRate")}
-                      </div>
-                    )}
-
-                    {/* Value */}
-                    <div className="flex items-baseline justify-between mb-1.5 min-h-[18px]">
-                      <span className={`text-[9.5px] font-bold ${isDark ? "text-slate-500" : "text-slate-400"}`}>설정 비율</span>
-                      <span className={`text-xs font-black font-sans transition-colors flex items-center space-x-1.5 ${
-                        isDark ? "text-slate-100" : "text-slate-900"
-                      }`}>
-                        <span>{val.toFixed(1)}%</span>
-                        <span className="text-[8.5px] text-[#A7AAE1] bg-[#A7AAE1]/15 border border-[#A7AAE1]/25 px-1 py-0.2 rounded font-sans font-bold">
-                          기본 비율
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* Slider */}
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
-                        className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
-                          isDark 
-                            ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-90" 
-                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-90 shadow-2xs"
-                        }`}
-                      >
-                        －
-                      </button>
-                      <input
-                        type="range"
-                        min={detail.min}
-                        max={detail.max}
-                        step={detail.step}
-                        value={val}
-                        onChange={(e) => onInputChange({ [detail.key]: parseFloat(e.target.value) })}
-                        className="flex-1 min-w-0 w-full accent-indigo-500 h-1 bg-slate-200 dark:bg-slate-800 rounded cursor-pointer"
-                      />
-                      <button
-                        onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
-                        className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
-                          isDark 
-                            ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-90" 
-                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-90 shadow-2xs"
-                        }`}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* 유병자연금 효과 카드 */}
-              {(() => {
-                const detail = getCardDetails("illHealthEffect");
-                const val = inputs.illHealthEffect;
-                const tooltipActive = activeTooltip === "illHealthEffect";
-                return (
-                  <div className={`flex flex-col justify-between p-3 rounded-xl border transition-all duration-300 relative select-none ${
-                    isDark 
-                      ? "bg-slate-950/60 border-slate-800/80 hover:bg-slate-950/90" 
-                      : "bg-slate-50 border-slate-200 hover:bg-white hover:shadow"
-                  }`}>
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className={`text-[10.5px] font-black truncate ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-                        {detail.title}
-                      </span>
-                      <button 
-                        onClick={() => setActiveTooltip(tooltipActive ? null : "illHealthEffect")}
-                        className="text-slate-500 hover:text-indigo-500 focus:outline-none"
-                      >
-                        <HelpCircle className="w-2.5 h-2.5" />
-                      </button>
-                    </div>
-
-                    {tooltipActive && (
-                      <div className={`text-[9.5px] leading-relaxed p-1.5 rounded-lg border mb-2 select-none ${
-                        isDark ? "bg-slate-900 text-slate-300 border-slate-800" : "bg-white text-slate-650 border-slate-150 shadow-sm"
-                      }`}>
-                        {getHelpContent("illHealthEffect")}
-                      </div>
-                    )}
-
-                    {/* Value */}
-                    <div className="flex items-baseline justify-between mb-1.5 min-h-[18px]">
-                      <span className={`text-[9.5px] font-bold ${isDark ? "text-slate-500" : "text-slate-400"}`}>설정 비율</span>
-                      <span className={`text-xs font-black font-sans transition-colors flex items-center space-x-1.5 ${
-                        isDark ? "text-slate-100" : "text-slate-900"
-                      }`}>
-                        <span>{val}%</span>
-                        <span className="text-[8.5px] text-emerald-400 bg-emerald-555/15 border border-emerald-500/25 px-1 py-0.2 rounded font-sans font-bold">
-                          개선 배수
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* Slider */}
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => adj(detail.key, -detail.stepDelta, detail.min, detail.max)}
-                        className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
-                          isDark 
-                            ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-90" 
-                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-90 shadow-2xs"
-                        }`}
-                      >
-                        －
-                      </button>
-                      <input
-                        type="range"
-                        min={detail.min}
-                        max={detail.max}
-                        step={detail.step}
-                        value={val}
-                        onChange={(e) => onInputChange({ [detail.key]: parseFloat(e.target.value) })}
-                        className="flex-1 min-w-0 w-full accent-indigo-500 h-1 bg-slate-200 dark:bg-slate-800 rounded cursor-pointer"
-                      />
-                      <button
-                        onClick={() => adj(detail.key, detail.stepDelta, detail.min, detail.max)}
-                        className={`w-5.5 h-5.5 shrink-0 flex-none rounded-lg font-bold text-[9px] flex items-center justify-center transition focus:outline-none border ${
-                          isDark 
-                            ? "bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300 active:scale-90" 
-                            : "bg-white hover:bg-slate-100 border-slate-250 text-slate-700 active:scale-90 shadow-2xs"
-                        }`}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

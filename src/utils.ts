@@ -209,6 +209,10 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
     retirementBalance = balance;
   }
 
+  const retirementPrincipal = principal;
+  const retirementReinvested = reinvested;
+  const retirementGains = gains;
+
   // 인출기 목표 연간 인출액 산정
   let withdrawnTarget = annualWithdrawal;
   if (isNonTaxable) {
@@ -436,6 +440,9 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   return {
     timeline,
     retirementBalance,
+    retirementPrincipal,
+    retirementReinvested,
+    retirementGains,
     depleteAge,
     firstYearGainVsWithdraw,
     accumulationYears: endAge - startAge,
